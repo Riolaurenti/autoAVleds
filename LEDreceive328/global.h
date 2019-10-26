@@ -23,7 +23,8 @@ bool cFlag = 0; //clock Flag
 bool pFlag[8] = {0,0,0,0, 0,0,0,0}; //pulse Flag
 int itX = 0;
 int Mode = 0; //Menu pulse/auto
-
+int ioRule[] = {0,0,0,0,0}; // Rule Holder for Primary/Secondary MCU
+int iAm = 0; //Change to cur MCU#
 
 
 int arrA[64] = {};

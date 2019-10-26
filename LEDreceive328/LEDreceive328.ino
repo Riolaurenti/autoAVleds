@@ -113,14 +113,21 @@ void eHandler(int aa) {
   switch (iicTable[0]) {
     case 1:       Mode = 0;      break;
     case 2:      Mode = 1;      break;
-    case 3:    {
+    case 3:    { // receive current step integer from clock
       cFlag=1;
-      cur_Step=iicTable[1]; // receive current step integer from clock
+      cur_Step=iicTable[1]; 
       break;
     }
-    case 4: {
-      // Won't recive array's - use Push Pull on Pulse...
+    case 4: {  // Is this Controller Primary or Secondary?
+      for(int i=0;i<sizeof(ioRule);i++){
+        ioRule[i]=iicTable[i+1];
+        iAm=ioRule[0]; //(use to change Mode if non auto is on - dont be fooled by current clk control)
+        Mode = iAm ; //Temporary placeholder, use if(auto mode = 0 and zone ctrl = 1)
+        DPRINT(ioRule[i]);
       }
+      break;
+    }
+    //case 5:
     
     case 10:      pFlag[0] = 1;      break;
     case 11:      pFlag[1] = 1;      break;

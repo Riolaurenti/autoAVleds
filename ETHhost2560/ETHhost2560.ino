@@ -8,6 +8,7 @@
 #include"global.h"
 #include "macros.h"
 #include"cOSC.h"
+#include "clk.h"
 
 EthernetUDP Udp;
 
@@ -26,8 +27,8 @@ void setup() {
 }
 
 void loop() {
+  countBars();
   routeOSC();
-  //printMon();
 }
 
 
@@ -54,7 +55,6 @@ void routeOSC() {
      }
    }
 }
-
 
 
  /*

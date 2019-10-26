@@ -1,6 +1,10 @@
 int clk = 0;
+int tClk = 0 ; //Counter for bars
 int vol = 0;
 int mode = 0;
+int ioRule[5] = {0,0,0,0,0}; // Is Channel 0)Primary 1)Secondary 2) Tertary
+int ioRuleMem[5] = {0,0,0,0,0};
+
 int arrA[64] = {
   0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
   0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,

@@ -3,10 +3,10 @@ void iicPulse(int dest, int type) {
   Wire.write(type);
   Wire.endTransmission();
 }
-void iicArray(int dest, int data[64]) {
+void iicArray(int dest, int data[8]) {
   Wire.beginTransmission(dest);
   Wire.write(4);
-  for(int i = 0 ; i < 64; i++){
+  for(int i = 0 ; i < 8; i++){
   Wire.write(data[i]);
   }
   Wire.endTransmission();
