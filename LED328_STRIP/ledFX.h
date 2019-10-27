@@ -102,7 +102,8 @@ void iterator() { // realy bad example of on frame actions
  * Old Patterns from DV2
  */
 void theLights() {
-  runCheck(50);
+  runCheck(10);
+  fadeToBlackBy(&(leds[0]), NUM_LEDS, 10);
   int pos = random16(0, NUM_LEDS);
   colorIndex = (colorIndex + 10);
   if (colorIndex > 254) {
@@ -126,6 +127,7 @@ void rainbow() {
 }
 void sinelon() {
    runCheck(10);
+  fadeToBlackBy(&(leds[0]), NUM_LEDS, 20);
   int pos = beatsin16( 13, 0, NUM_LEDS - 1 ) ;
   colorIndex++;
   if (colorIndex > 254) { // maybe further reduce by making colorIndex cycHue? Or a global timer
@@ -133,17 +135,22 @@ void sinelon() {
   }
   leds[pos] = ColorFromPalette( cPal, colorIndex, brightness, currentBlending);
 }
+
 void bpm() {
   runCheck(10);
-  uint8_t beat = beatsin8( fxDelay, 64, 255);
+  uint8_t beat = beatsin8( 62, 64, 255);
   for (int i = 0; i < NUM_LEDS; i++) { 
-    colorIndex++; //not necessary...
-    if (colorIndex > 254) {//not necessary...
+    EVERY_N_MILLISECONDS(20){
+     colorIndex++; //not necessary...
+     if (colorIndex > 254) {//not necessary...
       colorIndex = 0;//not necessary...
-      leds[i] = ColorFromPalette(cPal, colorIndex + (i * 2), beat - 0 + (i * 10));
-      }
-  }
+     }
+    }
+    leds[i] = ColorFromPalette(cPal, colorIndex + (i * 2), beat - 0 + (i * 10));
+    }
 }
+
+
 void bouncingTrails(){ // this is some messy code - will come back to it...
    runCheck(10);
   //sets a "spawn" in the middle half of a strip then sends a trail in either direction which bounces of the ends of the strip.
@@ -210,6 +217,73 @@ void bouncingTrails(){ // this is some messy code - will come back to it...
   }
   lastCount=counter;
 }
+/* NOT WORK!
+void palLoop() {
+  runCheck(30);
+  for(int j=0;j<3;j++){
+      for(int k=0;k<256;k++){
+        switch(j){
+          case 0: setAll(k,0,0); break;
+          case 1: setAll(0,k,0); break;
+          case 2: setAll(0,0,k); break;
+        }
+      }
+    for(int k=255;k>=0;k--){
+        switch(j){
+          case 0: setAll(k,0,0); break;
+          case 1: setAll(0,k,0); break;
+          case 2: setAll(0,0,k); break;
+        }
+      }
+  }
+}
+*/ 
+
+///also not working!
+void BouncingBalls(byte red, byte green, byte blue, int BallCount) {
+  runCheck(50);
+  float Gravity = -9.81;
+  int StartHeight = 1;
+  float Height[BallCount];
+  float ImpactVelocityStart = sqrt( -2 * Gravity * StartHeight );
+  float ImpactVelocity[BallCount];
+  float TimeSinceLastBounce[BallCount];
+  int   Position[BallCount];
+  long  ClockTimeSinceLastBounce[BallCount];
+  float Dampening[BallCount];
+  
+  for (int i = 0 ; i < BallCount ; i++) {  
+    ClockTimeSinceLastBounce[i] = millis();
+    Height[i] = StartHeight;
+    Position[i] = 0;
+    ImpactVelocity[i] = ImpactVelocityStart;
+    TimeSinceLastBounce[i] = 0;
+    Dampening[i] = 0.90 - float(i)/pow(BallCount,2);
+  }
+
+  while (true) {
+    for (int i = 0 ; i < BallCount ; i++) {
+      TimeSinceLastBounce[i] =  millis() - ClockTimeSinceLastBounce[i];
+      Height[i] = 0.5 * Gravity * pow( TimeSinceLastBounce[i]/1000 , 2.0 ) + ImpactVelocity[i] * TimeSinceLastBounce[i]/1000;
+ 
+      if ( Height[i] < 0 ) {                      
+        Height[i] = 0;
+        ImpactVelocity[i] = Dampening[i] * ImpactVelocity[i];
+        ClockTimeSinceLastBounce[i] = millis();
+ 
+        if ( ImpactVelocity[i] < 0.01 ) {
+          ImpactVelocity[i] = ImpactVelocityStart;
+        }
+      }
+      Position[i] = round( Height[i] * (NUM_LEDS - 1) / StartHeight);
+    }
+ 
+    for (int i = 0 ; i < BallCount ; i++) {
+      setPixel(Position[i],red,green,blue);
+    } 
+    //setAll(0,0,0);
+  }
+}
 
 
 /*
@@ -265,6 +339,7 @@ void rider() {
 }
 
 void colourFill() {
+   fadeToBlackBy(&(leds[0]), NUM_LEDS, 20); // keep or not?
   static byte currentColor = 0;
   static byte currentRow = 0;
   static byte currentDirection = 0;
@@ -311,7 +386,7 @@ void slantBars() {
   runCheck(5);
   for (byte x = 0; x < kMatrixWidth; x++) {
     for (byte y = 0; y < kMatrixHeight; y++) {
-      leds[XY(x, y)] = CHSV(cycHue, 255, quadwave8(x * 32 + y * 32 + slantPos));
+      leds[XY(x, y)] = CHSV(cycHue, 255, quadwave8(x * 32 + y + slantPos));
     }
   }
   slantPos -= 4;
@@ -343,9 +418,101 @@ void confetti() {
     leds[XY(random16(kMatrixWidth), random16(kMatrixHeight))] = ColorFromPalette(cPal, random16(255), 255); //CHSV(random16(255), 255, 255);
     }
 }
+
+/*
+ * Noise Code
+ */
+
+ /*
+void mapNoiseToLEDsUsingPalette()
+{
+  static uint8_t ihue=0;
+  for(int i = 0; i < kMatrixWidth; i++) {
+    for(int j = 0; j < kMatrixHeight; j++) {
+      // We use the value at the (i,j) coordinate in the noise
+      // array for our brightness, and the flipped value from (j,i)
+      // for our pixel's index into the color palette.
+      uint8_t index = noise[j][i];
+      uint8_t bri =   noise[i][j];
+      // if this palette is a 'loop', add a slowly-changing base value
+      if( colorLoop) { 
+        index += ihue;
+      }
+      // brighten up, as the color palette itself often contains the 
+      // light/dark dynamic range desired
+      if( bri > 127 ) {
+        bri = 255;
+      } else {
+        bri = dim8_raw( bri * 2);
+      }
+      CRGB color = ColorFromPalette( cPal, index, bri);
+      leds[XY(i,j)] = color;
+    }
+  }
+  ihue+=1;
+}
+void fillNoise8() {
+  uint8_t dataSmoothing = 0;
+  if( speed < 50) {
+    dataSmoothing = 200 - (speed * 4);
+  }  
+  for(int i = 0; i < MAX_DIMENSION; i++) {
+    int ioffset = scale * i;
+    for(int j = 0; j < MAX_DIMENSION; j++) {
+      int joffset = scale * j;
+   
+      uint8_t data = inoise8(xX + ioffset,yY + joffset,zZ);
+      // The range of the inoise8 function is roughly 16-238.
+      // These two operations expand those values out to roughly 0..255
+      // You can comment them out if you want the raw noise data.
+      data = qsub8(data,16);
+      data = qadd8(data,scale8(data,39));
+
+      if( dataSmoothing ) {
+        uint8_t olddata = noise[i][j];
+        uint8_t newdata = scale8( olddata, dataSmoothing) + scale8( data, 256 - dataSmoothing);
+        data = newdata;
+      }
+      noise[i][j] = data;
+    }
+  }
+  zZ += speed;
+  // apply slow drift to X and Y, just for visual variation.
+  xX += speed / 8;
+  yY -= speed / 16;
+  mapNoiseToLEDsUsingPalette();
+}
+*/
+void fire()
+{
+  static byte heat[NUM_LEDS];
+    for( int i = 0; i < NUM_LEDS; i++) {
+      heat[i] = qsub8( heat[i],  random(0, ((COOLING * 10) / NUM_LEDS) + 2));
+    }
+    for( int k= NUM_LEDS - 1; k >= 2; k--) {
+      heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
+    }
+    if( random() < SPARKING ) {
+      int y = random(7);
+      heat[y] = qadd8( heat[y], random(160,255) );
+    }
+    for( int j = 0; j < NUM_LEDS; j++) {
+      byte colorindex = scale8( heat[j], 240);
+      CRGB color = ColorFromPalette( cPal, colorindex);
+      int pixelnumber;
+      if( gReverseDirection ) {
+        pixelnumber = (NUM_LEDS-1) - j;
+      } else {
+        pixelnumber = j;
+      }
+      leds[pixelnumber] = color;
+    }
+}
+
 /*
  * Strobe Code!
  */
+ 
 static void strobeDraw( uint8_t startpos, uint16_t lastpos, uint8_t period, uint8_t width, uint8_t huestart, uint8_t huedelta, uint8_t saturation, uint8_t value) {
   uint8_t hue = huestart;
   for ( uint16_t i = startpos; i <= lastpos; i += period) {
@@ -389,7 +556,9 @@ void strobeCore(uint8_t dashperiod, uint8_t dashwidth, int8_t  dashmotionspeed, 
   strobeDraw( sStartPosition, NUM_LEDS - 1, dashperiod, dashwidth, sStartHue, huedelta, kSaturation, kValue);
 }
 void simpleStrobe () {
-  const uint8_t kStrobeCycleLength = 6; // light every Nth frame
+  runCheck(20);
+  fill_solid( leds, NUM_LEDS, CRGB::Black);
+  const uint8_t kStrobeCycleLength = 4; // light every Nth frame
   static uint8_t sStrobePhase = 0;
   sStrobePhase = sStrobePhase + 1;
   colorIndex++;
@@ -400,7 +569,7 @@ void simpleStrobe () {
     sStrobePhase = 0;
   }
   if ( sStrobePhase == 0 ) {
-    uint8_t dashperiod = beatsin8( 8/*cycles per minute*/, 4, 10);
+    uint8_t dashperiod = beatsin8( 8, 4, 10);
     uint8_t dashwidth = (dashperiod / 4) + 1;
     uint8_t zoomBPM = STROBE_BEATS_PER_MINUTE;
     int8_t  dashmotionspeed = beatsin8( (zoomBPM / 2), 1, dashperiod);
@@ -410,7 +579,7 @@ void simpleStrobe () {
     uint8_t cycle = beat8(2); // two cycles per minute
     uint8_t easedcycle = ease8InOutCubic( ease8InOutCubic( cycle));
     uint8_t wavecycle = cubicwave8( easedcycle);
-    // uint8_t hueShift = 0; // NO SHIFT OF HUE IN COLOUR (we should rebuild in RGB...)
+    //uint8_t hueShift = 0; // NO SHIFT OF HUE IN COLOUR (we should rebuild in RGB...)
     uint8_t hueShift = scale8( wavecycle, 130); // METHOD HOW HUE VALUE SHIFTS
     uint8_t strobesPerPosition = 2; // try 1..4
     strobeCore( dashperiod, dashwidth, dashmotionspeed, strobesPerPosition, hueShift);

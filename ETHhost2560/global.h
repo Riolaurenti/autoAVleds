@@ -1,6 +1,20 @@
-int clk = 0;
-int vol = 0;
-int mode = 0;
+int clk = 0; // Get clock int
+int tClk = 0 ; //Counter for bars
+int cPal = 0; // global Palette Choice
+int cPalVal = 0;
+int cFX = 0; // Global current FX Choice
+int cpFX = 0; // Global pulse choice
+int howManyBars = 0; // Global holder for HowmanyBars until change...
+int i; 
+int ratio = 4; // value to devide the counter by
+int runT = 32; // runtime / max divisable quantity
+
+int vol = 0; // volume debug holder
+
+int mode = 0; // current Mode selection.
+int ioRule[5] = {0,0,0,0,0}; // Is Channel 0)Primary 1)Secondary 2) Tertary
+int ioRuleMem[5] = {0,0,0,0,0};
+
 int arrA[64] = {
   0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
   0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0,
