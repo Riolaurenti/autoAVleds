@@ -1,20 +1,3 @@
-// Global variables
-boolean fxInit = false; // indicates if a pattern has been recently switched
-uint16_t fxDelay = 0; // time between automatic effect changes
-uint16_t FXdel = 0;
-unsigned long fxMil = 0; // store the time of last effect function run
-unsigned long cycMil = 0; // store the time of last effect change
-unsigned long cMil; // store current loop's millis value
-unsigned long hMil; // store time of last hue change
-unsigned long cFXmil; // store current loop's millis value
-unsigned long FXmil; // store time of last hue change
-byte cFX = 0; // index to the currently running effect
-byte cBright = STARTBRIGHT; // 0-255 will be scaled to 0-MAXBRIGHTNESS
-
-CRGBPalette16 cPal(RainbowColors_p); // global palette storage
-
-typedef void (*functionList)(); // definition for list of effect function pointers
-extern const byte numFX;
 
 // Increment the global hue value for functions that use it
 byte cycHue = 0;
@@ -70,66 +53,67 @@ void scrollArray(byte scrollDir) {
   
 }
 
-
+void selPal() {
+  switch(cPalVal) {
+    case 0:    cPal = CloudColors_p;    break;
+    case 1:     cPal = LavaColors_p;    break;
+    case 2:    cPal = OceanColors_p;    break;
+    case 4:    cPal = ForestColors_p;    break;
+    case 5:    cPal = RainbowColors_p;    break;    
+    case 6:    cPal = PartyColors_p;    break;    
+    case 7:    cPal = HeatColors_p;    break;
+    case 8:    cPal = Pastel1_08_gp;    break;
+    case 9:    cPal = Paired_08_gp;    break;
+    case 10:    cPal = Dark2_08_gp;    break;
+    case 11:    cPal = RdYlGn_08_gp;    break;
+    case 12:    cPal = RdYlBu_08_gp;    break;
+    case 13:    cPal = RdBu_08_gp;    break;
+    case 14 :    cPal = PuOr_08_gp;    break;
+    case 15:    cPal = PRGn_08_gp;    break;
+    case 16:    cPal = Fuschia_8_gp;      break;
+    case 17:      cPal = saga_07_gp;      break;
+    case 18:      cPal = saga_08_gp;      break;
+    case 19:      cPal = saga_09_gp;      break;
+    case 20:      cPal = saga_10_gp;      break;
+    case 21:      cPal = saga_11_gp;      break;
+    case 22:      cPal = saga_12_gp;      break;
+    case 23:      cPal = saga_13_gp;      break;
+    case 24:      cPal = saga_14_gp;      break;
+    case 25:      cPal = saga_15_gp;      break;
+    case 26:      cPal = saga_17_gp;      break;    
+    }
+}
 // Pick a random palette from a list
 void selectRandomPalette() {
   switch(random8(8)) {
-    case 0:    cPal = CloudColors_p;
-    break;
-    case 1:     cPal = LavaColors_p;
-    break;
-    case 2:    cPal = OceanColors_p;
-    break;
-    case 4:    cPal = ForestColors_p;
-    break;
-    case 5:    cPal = RainbowColors_p;
-    break;    
-    case 6:    cPal = PartyColors_p;
-    break;    
-    case 7:    cPal = HeatColors_p;
-    break;
-    case 8:    cPal = Pastel1_08_gp;
-    break;
-    case 9:    cPal = Paired_08_gp;
-    break;
-    case 10:    cPal = Dark2_08_gp;
-    break;
-    case 11:    cPal = RdYlGn_08_gp;
-    break;
-    case 12:    cPal = RdYlBu_08_gp;
-    break;
-    case 13:    cPal = RdBu_08_gp;
-    break;
-    case 14 :    cPal = PuOr_08_gp;
-    break;
-    case 15:    cPal = PRGn_08_gp;
-    break;
-    case 16:    cPal = Fuschia_8_gp;
-      break;
-    case 17:      cPal = saga_07_gp;
-      break;
-    case 18:      cPal = saga_08_gp;
-      break;
-    case 19:      cPal = saga_09_gp;
-      break;
-    case 20:      cPal = saga_10_gp;
-      break;
-    case 21:      cPal = saga_11_gp;
-      break;
-    case 22:      cPal = saga_12_gp;
-      break;
-    case 23:      cPal = saga_13_gp;
-      break;
-    case 24:      cPal = saga_14_gp;
-      break;
-    case 25:      cPal = saga_15_gp;
-      break;
-    case 26:      cPal = saga_17_gp;
-      break;
-    
+    case 0:    cPal = CloudColors_p;    break;
+    case 1:     cPal = LavaColors_p;    break;
+    case 2:    cPal = OceanColors_p;    break;
+    case 4:    cPal = ForestColors_p;    break;
+    case 5:    cPal = RainbowColors_p;    break;    
+    case 6:    cPal = PartyColors_p;    break;    
+    case 7:    cPal = HeatColors_p;    break;
+    case 8:    cPal = Pastel1_08_gp;    break;
+    case 9:    cPal = Paired_08_gp;    break;
+    case 10:    cPal = Dark2_08_gp;    break;
+    case 11:    cPal = RdYlGn_08_gp;    break;
+    case 12:    cPal = RdYlBu_08_gp;    break;
+    case 13:    cPal = RdBu_08_gp;    break;
+    case 14 :    cPal = PuOr_08_gp;    break;
+    case 15:    cPal = PRGn_08_gp;    break;
+    case 16:    cPal = Fuschia_8_gp;      break;
+    case 17:      cPal = saga_07_gp;      break;
+    case 18:      cPal = saga_08_gp;      break;
+    case 19:      cPal = saga_09_gp;      break;
+    case 20:      cPal = saga_10_gp;      break;
+    case 21:      cPal = saga_11_gp;      break;
+    case 22:      cPal = saga_12_gp;      break;
+    case 23:      cPal = saga_13_gp;      break;
+    case 24:      cPal = saga_14_gp;      break;
+    case 25:      cPal = saga_15_gp;      break;
+    case 26:      cPal = saga_17_gp;      break;
     }
 }
-
 
   // Determine flash address of text string
 unsigned int currentStringAddress = 0;

@@ -9,6 +9,8 @@
  * I2C > Pjon converter code
  * Takes all I2c arguements, builds a string then sends over network
  * Here determines route to Network from the Master EthHost2560
+ * 
+ * ToDo - Ignore Master
  */
 
 void receiveEvent(int howMany) {
@@ -19,15 +21,15 @@ void receiveEvent(int howMany) {
   DPRINTLN();
   DPRINT("ASSEMBLED MESSAGE FROM I2C : ");
   DPRINTLN(i2cStr);
-  sendMaster(i2cStr);
+  sendPjon(i2cStr);
   i2cStr = "";
 }
 
-void sendMaster(String str){ 
+void sendPjon(String str){ 
   DPRINT("SENDING TO MASTER");
   const char pkt[str.length()+1]; // Create array
   str.toCharArray(pkt,str.length()+1); // Convert string to Char[]
-  bus.send(254,pkt,str.length()+1); // Send the packet to master. 
+  bus.send(PJON_BROADCAST,pkt,str.length()+1); // Send the packet to everyone 
   DPRINTLN(pkt);
 };
 
@@ -40,29 +42,9 @@ void setup() {
   bus.strategy.set_pin(12); // Set PJON pin
   bus.begin(); //
   delay(160); // possibly not needed if master is online
-  bus.acquire_id_master_slave(); //get an id
-  delayStart = millis();
-  delayRunning = true;
 }
 
 void loop() {
-  if (delayRunning && ((millis() - delayStart) >= DELAY_TIME)) {
-    if (bus.device_id() == PJON_NOT_ASSIGNED) {
-      resetFunc(); // reset
-    }
-    if (!acquired | !ack) {
-      bus.send(254, "Chk,", 5);
-      acquired = true;
-      ack = true;
-    }
-    delayStart += DELAY_TIME; // No id has been assigned and 15s have elapsed
-  }
-  if ((bus.device_id() != PJON_NOT_ASSIGNED) && !acquired) { // we have an id, but havent regisrtered
-    DPRINTLN(bus.device_id());
-    delay(100);
-    acquired = true; // track that
-    //tellMasterAboutSelf(); // and register
-  }
   bus.update(); // update the PJON
   bus.receive(5000); // receive for a while
 }

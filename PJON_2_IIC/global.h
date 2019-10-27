@@ -4,9 +4,9 @@ String regString = "Reg,Strip,TV,4"; // The command sent to register device with
 // PJON stuff //
 
 #define PJON_INCLUDE_SWBB
-#include <PJONSlave.h>  // Coz we are inslave mode .
+#include <PJON.h>  // Coz we are inslave mode .
 uint8_t bus_id[] = {0, 0, 1, 53}; // Ancs unique ID
-PJONSlave<SoftwareBitBang> bus(bus_id, PJON_NOT_ASSIGNED); // Force no id so master can assign us
+PJON<SoftwareBitBang> bus(bus_id, 10); // Choose Bus ID
 int packet; // Holder for our packet
 bool acquired = false; // did we get an address? 
 bool debugMode = false; // Are we debugging

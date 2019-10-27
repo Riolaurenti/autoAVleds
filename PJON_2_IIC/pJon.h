@@ -41,32 +41,14 @@ void error_handler(uint8_t code, uint16_t data, void *custom_pointer) {
     if(data == PJON_ID_NEGATE)
       // We wont encounter this as we dont intend to give up out ID
       DPRINTLN("PJONSlave error: master-slave id release failed.");
-    if(data == PJON_ID_REQUEST)
-      // We couldnt find a Master on the network.... 
-      DPRINTLN("PJONSlave error: master-slave id request failed.");
-      delay(40); // wait 400ms
-      if (millis() > 15000){ // if 15s has passed
-        DPRINTLN("Resetting due to no ID");
-        delay(300); // we reset
-        resetFunc();
-        } // if not
-      bus.acquire_id_master_slave(); // try and get an id again
-      acquired = false; // make sure we resend our registration when we reconnect
-      delay(160); // makes the delay about 500ms between retrys
-     
- }
+  }
   DFLUSH(); // wait til serial is printed
 };
 
 void receiver_handler(uint8_t *payload, uint16_t length, const PJON_Packet_Info &packet_info) {
   const  char * arr = payload; // Not a pointer now.... !
   string.concat(arr); // addd it to our string
-  if( string.startsWith("ack")){ // master got our registation message!
-    ack = true; // nice
-    string = ""; // thats all it says!
-    DPRINT("Heard from server : "); 
-  }
-  else parser(); // whats it say then ?? 
+  parser(); // whats it say then ?? 
   // prints it to the console letter by letter
   DPRINT("Received: ");
   for(uint16_t i = 0; i < length; i++) {
@@ -75,9 +57,4 @@ void receiver_handler(uint8_t *payload, uint16_t length, const PJON_Packet_Info 
   }
   DPRINTLN();
   DFLUSH();
-};
-void tellMasterAboutSelf(){ 
-  const char pkt[regString.length()+1]; // Create array
-  regString.toCharArray(pkt,regString.length()+1); // Convert string to Char[]
-  bus.send(254,pkt,regString.length()+1); // Send the packet to master. 
 };

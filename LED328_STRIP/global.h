@@ -38,6 +38,7 @@ CRGBPalette16 cPal(RainbowColors_p); // global palette storage
 typedef void (*functionList)(); // definition for list of effect function pointers
 extern const byte numFX;
 
+
 #define STROBE_BEATS_PER_MINUTE 97.5
 uint8_t gHue = 0;
 int myDelay = 30;
@@ -45,7 +46,7 @@ int colorIndex = 0;
 int patternNumber = 2;
 uint8_t brightness = 255;
 TBlendType currentBlending;
-
+int cPalVal = 0;
 
 int sStatic = 0; //setup placeholder 
 int cur_Step = 0;
@@ -58,10 +59,3 @@ int Mode = 0; //Menu pulse/auto
 int Solo = 0; // host auto / solo auto
 int ioRule[] = {0,0,0,0,0}; // Rule Holder for Primary/Secondary MCU
 int iAm = 0; //Change to cur MCU#
-int cPalVal = 0;
-
-
-int arrA[64] = {};
-int arrB[64] = {};
-int arrC[64] = {};
-int arrD[64] = {};

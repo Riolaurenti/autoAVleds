@@ -38,7 +38,6 @@ functionList fxList[] = {
   fire,
   palLoop,
   BouncingBalls,
-
   txtA,
   txtB,
   txtC
@@ -75,7 +74,7 @@ void loop() {
     // switch to a new effect every cycleTime milliseconds
     if (cMil - cycMil > cTime) {
       cycMil = cMil;
-      if (++cFX >= numFX) cFX = 0; // loop to start of effect list
+      if(Solo==1)if (++cFX >= numFX) cFX = 0; // loop to start of effect list
       fxInit = false; // trigger effect initialization when new effect is selected *****
     }
   }
@@ -91,14 +90,14 @@ void loop() {
       }
   }
   if(Mode==1){ // when pulse on..
-      pulseFX[1](); //
+      pulseFX[cpFX](); //
   }
   // run a fade effects too.. 
   if (Mode==0){
     if(fxList[cFX] == confetti) fadeAll(1);
     if(fxList[cFX] == theLights) fadeAll(5);
     if(fxList[cFX] == sinelon) fadeAll(1);
-     if(fxList[cFX] == bpm) fadeAll(1);
+    if(fxList[cFX] == bpm) fadeAll(1);
     if(fxList[cFX] == bouncingTrails) fadeAll(1);
   }
   if (Mode==1){
@@ -117,16 +116,25 @@ void eHandler(int aa) {
   }
   DPRINTLN();
   switch (iicTable[0]) {
-    case 1:      Mode = 0;      break;
+    case 1:       Mode = 0;      break;
     case 2:      Mode = 1;      break;
-    case 3:    {
+    case 3:    { // receive current step integer from clock
       cFlag=1;
-      cur_Step=iicTable[1]; // receive current step integer from clock
+      cur_Step=iicTable[1]; 
       break;
     }
-    case 4: {
-      // Won't recive array's - use Push Pull on Pulse...
+    case 4: {  // Is this Controller Primary or Secondary?
+      for(int i=0;i<sizeof(ioRule);i++){
+        ioRule[i]=iicTable[i+1];
+        iAm=ioRule[0]; //(use to change Mode if non auto is on - dont be fooled by current clk control)
+        Mode = iAm ; //Temporary placeholder, use if(auto mode = 0 and zone ctrl = 1)
+        DPRINT(ioRule[i]);
       }
+      break;
+    }
+    case 5:       cPalVal = iicTable[1]; break; //get cPal
+    case 6:       cFX = iicTable[1]; break; //get cFX
+    case 7:       cpFX = iicTable[1]; break; //get cpFX (merge into message case #6)
     
     case 10:      pFlag[0] = 1;      break;
     case 11:      pFlag[1] = 1;      break;

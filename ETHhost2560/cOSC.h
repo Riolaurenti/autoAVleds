@@ -3,6 +3,12 @@ void iicPulse(int dest, int type) {
   Wire.write(type);
   Wire.endTransmission();
 }
+void iicInt(int dest, int type, int val) {
+  Wire.beginTransmission(dest);
+  Wire.write(type);
+  Wire.write(val);
+  Wire.endTransmission();
+}
 void iicArray(int dest, int data[8]) {
   Wire.beginTransmission(dest);
   Wire.write(4);
@@ -11,7 +17,7 @@ void iicArray(int dest, int data[8]) {
   }
   Wire.endTransmission();
 }
-void iicClk(int dest, int curStep) {
+void iicClk(int dest, int curStep) { // unnecessary, use iicInt
   Wire.beginTransmission(dest);
   Wire.write(3);
   Wire.write(curStep);

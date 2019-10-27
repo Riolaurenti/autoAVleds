@@ -1,20 +1,16 @@
 #include <FastLED.h>
 #include <Wire.h>
-#include <LEDMatrix.h>
-#include <LEDText.h>
-#include <FontMatrise.h>
 /*
  * DO NOT FORGET TO UPDATE YOUR XY MAPPINGS!
- * 
- * Current Setup is for 6 8x8 Matrices, 3 in each row (see XY)
  */
 
-#define LED_PIN        5
-#define LED_PIN2       7
+#define LED_PIN        3
+#define LED_PIN2       4
+#define LED_PIN3       5
+#define LED_PIN4       6
 
-
-#include "global.h"
 #include "XYmap.h"
+#include "global.h"
 #include "macros.h"
 #include "paints.h"
 #include "utils.h"
@@ -34,7 +30,15 @@ functionList fxList[] = {
   plasma,
   rider,
   colourFill,
-  slantBars
+  slantBars,
+  simpleStrobe,
+  theLights, //  fillNoise8,
+  fire,
+  palLoop,
+  BouncingBalls,
+  theLights, // for txt1 
+  theLights, // for txt2
+  theLights // for txt3
 };
 const byte numFX = (sizeof(fxList)/sizeof(fxList[0]));
 
@@ -50,8 +54,17 @@ void setup() {
   Wire.begin(ADDR);
   Wire.onReceive(eHandler);
   if (cFX > (numFX - 1)) cFX = 0;
-  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, NUM_LEDS/2);
-  FastLED.addLeds<CHIPSET, LED_PIN2, COLOR_ORDER> (leds, (NUM_LEDS/2)+1, LAST_VISIBLE_LED+1);
+  if(kMatrixHeight==1){
+    FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, LAST_VISIBLE_LED + 1);
+    DPRINT("1 strip");
+  }
+  else if(kMatrixHeight==4){
+    FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, kMatrixWidth);
+    FastLED.addLeds<CHIPSET, LED_PIN2, COLOR_ORDER> (leds, kMatrixWidth, kMatrixWidth);
+    FastLED.addLeds<CHIPSET, LED_PIN3, COLOR_ORDER> (leds, 2*kMatrixWidth, kMatrixWidth);
+    FastLED.addLeds<CHIPSET, LED_PIN4, COLOR_ORDER> (leds, 3*kMatrixWidth ,kMatrixWidth + 1);
+    DPRINT("4 strips");
+  }
   FastLED.setBrightness(scale8(cBright, MAXBRIGHT) );
 }
 
@@ -64,7 +77,7 @@ void loop() {
     // switch to a new effect every cycleTime milliseconds
     if (cMil - cycMil > cTime) {
       cycMil = cMil;
-      if (++cFX >= numFX) cFX = 0; // loop to start of effect list
+      if(Solo==1)if (++cFX >= numFX) cFX = 0; // loop to start of effect list 
       fxInit = false; // trigger effect initialization when new effect is selected *****
     }
   }
@@ -80,15 +93,15 @@ void loop() {
       }
   }
   if(Mode==1){ // when pulse on..
-      pulseFX[1](); //
+      pulseFX[cpFX](); //
   }
   // run a fade effects too.. 
   if (Mode==0){
     if(fxList[cFX] == confetti) fadeAll(1);
     if(fxList[cFX] == theLights) fadeAll(5);
     if(fxList[cFX] == sinelon) fadeAll(1);
-     if(fxList[cFX] == bpm) fadeAll(1);
-    if(fxList[cFX] == bouncingTrails) fadeAll(1);
+    if(fxList[cFX] == bpm) fadeAll(1);
+//    if(fxList[cFX] == bouncingTrails) fadeAll(1);
   }
   if (Mode==1){
     fadeAll(1); // fade out the leds after pulse
@@ -108,14 +121,23 @@ void eHandler(int aa) {
   switch (iicTable[0]) {
     case 1:       Mode = 0;      break;
     case 2:      Mode = 1;      break;
-    case 3:    {
+    case 3:    { // receive current step integer from clock
       cFlag=1;
-      cur_Step=iicTable[1]; // receive current step integer from clock
+      cur_Step=iicTable[1]; 
       break;
     }
-    case 4: {
-      // Won't recive array's - use Push Pull on Pulse...
+    case 4: {  // Is this Controller Primary or Secondary?
+      for(int i=0;i<sizeof(ioRule);i++){
+        ioRule[i]=iicTable[i+1];
+        iAm=ioRule[0]; //(use to change Mode if non auto is on - dont be fooled by current clk control)
+        Mode = iAm ; //Temporary placeholder, use if(auto mode = 0 and zone ctrl = 1)
+        DPRINT(ioRule[i]);
       }
+      break;
+    }
+    case 5:       cPalVal = iicTable[1]; break; //get cPal
+    case 6:       cFX = iicTable[1]; break; //get cFX
+    case 7:       cpFX = iicTable[1]; break; //get cpFX (merge into message case #6)
     
     case 10:      pFlag[0] = 1;      break;
     case 11:      pFlag[1] = 1;      break;

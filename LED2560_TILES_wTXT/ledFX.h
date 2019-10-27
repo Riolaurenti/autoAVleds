@@ -416,9 +416,6 @@ void confetti() {
 /*
  * Noise Code
  */
-
-
-
 void mapNoiseToLEDsUsingPalette()
 {
   static uint8_t ihue=0;

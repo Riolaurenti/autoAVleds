@@ -1,3 +1,11 @@
+/*
+ * OSC Host MCU - Takes OSC from Reaktor 6 and Forwards Messages to Router via I2C
+ * 
+ * Functions controlled here include all OSC receive commands.
+ * Current Global Messages : Flags for Pulse/Clock/Zones
+ *                           Ints for current Clk, Bar / pallette / autoFX and PulseFX
+ */
+
 #include <Ethernet.h>
 #include <EthernetUdp.h>
 #include <SPI.h>    
@@ -5,13 +13,14 @@
 #include <OSCBoards.h>
 #include <Wire.h>
 
+
 #include"global.h"
 #include "macros.h"
 #include"cOSC.h"
+#include "utils.h"
 #include "clk.h"
 
 EthernetUDP Udp;
-
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; 
 IPAddress ip(192, 168, 0, 150);
 const unsigned int inPort = 8888;
@@ -30,8 +39,9 @@ void loop() {
   countBars();
   routeOSC();
 }
-
-
+/*
+ * Route all Incoming OSC Bundles here
+ */
 void routeOSC() {
   OSCBundle bundleIN;
   int size;
@@ -55,8 +65,9 @@ void routeOSC() {
      }
    }
 }
-
-
+/*
+ * Receive I2C Arguements
+ */
  /*
 void eHandler(int aa) {
   while (1 < Wire.available()) { // loop through all but the last
