@@ -80,6 +80,8 @@ void selPal() {
     case 25:      cPal = saga_15_gp;      break;
     case 26:      cPal = saga_17_gp;      break;    
     }
+    DPRINT("pallete = ");
+    DPRINTLN(cPalVal);
 }
 /*
 // Pick a random palette from a list

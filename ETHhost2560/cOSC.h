@@ -1,45 +1,23 @@
-void iicPulse(int dest, int type) {
-  Wire.beginTransmission(dest);
-  Wire.write(type);
-  Wire.endTransmission();
-}
-void iicInt(int dest, int type, int val) {
-  Wire.beginTransmission(dest);
-  Wire.write(type);
-  Wire.write(val);
-  Wire.endTransmission();
-}
-void iicArray(int dest, int data[8]) {
-  Wire.beginTransmission(dest);
-  Wire.write(4);
-  for(int i = 0 ; i < 8; i++){
-  Wire.write(data[i]);
-  }
-  Wire.endTransmission();
-}
-void iicClk(int dest, int curStep) { // unnecessary, use iicInt
-  Wire.beginTransmission(dest);
-  Wire.write(3);
-  Wire.write(curStep);
-  Wire.endTransmission();
-}
+
 void printMon() {
-  /*
+  
   DPRINT("CLK = : ");
-  DPRINT("\t");
-  DPRINT(clk);
-  */
+  DPRINTLN(clk);
+  
  /*
   DPRINT("   Volume = : " );
   DPRINT(vol);
   DPRINTLN();
   */
- 
+
+ /*
   for (int i = 0; i<64; i++){ 
     DPRINT(arrA[i]);
     //DPRINT( "\t" ); 
   }
   DPRINTLN();
+*/
+  
  /*
   for (int j = 0; j<64; j++){ 
     DPRINT(arrB[j]);
@@ -64,7 +42,8 @@ void printMon() {
 void CLK(OSCMessage &msg, int addrOffset ){ // get float from clock #1 - Receive int/pulse
   int a = msg.getFloat(0);
   clk = a;
-  //printMon();
+  DPRINTLN(clk);
+  countBars();
   iicClk(2,clk);
 }
 

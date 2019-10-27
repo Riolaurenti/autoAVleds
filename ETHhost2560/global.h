@@ -1,6 +1,7 @@
 int clk = 0; // Get clock int
 int tClk = 0 ; //Counter for bars
 int cPal = 0; // global Palette Choice
+int cPalVal = 0;
 int cFX = 0; // Global current FX Choice
 int cpFX = 0; // Global pulse choice
 int howManyBars = 0; // Global holder for HowmanyBars until change...

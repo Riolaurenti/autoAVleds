@@ -16,9 +16,9 @@
 
 #include"global.h"
 #include "macros.h"
-#include"cOSC.h"
 #include "utils.h"
-#include "clk.h"
+#include"cOSC.h"
+
 
 EthernetUDP Udp;
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; 
@@ -36,8 +36,9 @@ void setup() {
 }
 
 void loop() {
-  countBars();
+  
   routeOSC();
+  
 }
 /*
  * Route all Incoming OSC Bundles here

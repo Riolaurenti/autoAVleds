@@ -18,27 +18,27 @@
 
 //autoMode Function List
 functionList fxList[] = {
-  glitter,
-  sideRain,
-  confetti,
-  theLights,
-  rainbow,
-  sinelon,
-  bpm,
-  bouncingTrails,
-  threeSine,
-  plasma,
-  rider,
-  colourFill,
-  slantBars,
-  simpleStrobe,
-  theLights, //  fillNoise8,
-  fire,
-  palLoop,
-  BouncingBalls,
-  theLights, // for txt1 
-  theLights, // for txt2
-  theLights // for txt3
+  glitter, //0
+  sideRain, //1
+  confetti,//2
+  theLights,//3
+  rainbow, //4
+  sinelon, //5
+  bpm, //6
+  bouncingTrails, //7
+  threeSine, //8
+  plasma, //9
+  rider, //10
+  colourFill, //11
+  slantBars, //12
+  simpleStrobe, //13
+  theLights, // fillNoise8, 14
+  theLights, // fire not working (15)
+  theLights ,  //palLoop, //16
+  theLights,//  BouncingBalls, //17
+  theLights, // for txt1 18
+  theLights, // for txt2 19
+  theLights // for txt3 //20
 };
 const byte numFX = (sizeof(fxList)/sizeof(fxList[0]));
 
@@ -89,7 +89,7 @@ void loop() {
     // run the currently selected effect every effectDelay milliseconds
     if (cMil - fxMil > fxDelay) {
       fxMil = cMil;
-      fxList[cFX](); // run the selected effect function
+      fxList[11](); // run the selected effect function
       }
   }
   if(Mode==1){ // when pulse on..
@@ -98,10 +98,10 @@ void loop() {
   // run a fade effects too.. 
   if (Mode==0){
     if(fxList[cFX] == confetti) fadeAll(1);
-    if(fxList[cFX] == theLights) fadeAll(5);
-    if(fxList[cFX] == sinelon) fadeAll(1);
+    //if(fxList[cFX] == theLights) fadeAll(2);
+    //if(fxList[cFX] == sinelon) fadeAll(2);
     if(fxList[cFX] == bpm) fadeAll(1);
-//    if(fxList[cFX] == bouncingTrails) fadeAll(1);
+    if(fxList[cFX] == bouncingTrails) fadeAll(1);
   }
   if (Mode==1){
     fadeAll(1); // fade out the leds after pulse
@@ -115,9 +115,10 @@ void eHandler(int aa) {
   while (Wire.available()) {
   iicTable[i] = Wire.read();    // receive byte as an integer
   i=i+1;
-  DPRINT(iicTable[i]);
+  //DPRINT("IC = ");
+  //DPRINTLN(iicTable[i]);
   }
-  DPRINTLN();
+  //DPRINTLN();
   switch (iicTable[0]) {
     case 1:       Mode = 0;      break;
     case 2:      Mode = 1;      break;
@@ -131,11 +132,16 @@ void eHandler(int aa) {
         ioRule[i]=iicTable[i+1];
         iAm=ioRule[0]; //(use to change Mode if non auto is on - dont be fooled by current clk control)
         Mode = iAm ; //Temporary placeholder, use if(auto mode = 0 and zone ctrl = 1)
-        DPRINT(ioRule[i]);
+        //DPRINT(ioRule[i]);
       }
       break;
     }
-    case 5:       cPalVal = iicTable[1]; break; //get cPal
+    case 5:      {
+      cPalVal = iicTable[1];
+      selPal();
+      //DPRINT("OK");
+    } break; //get cPal
+    
     case 6:       cFX = iicTable[1]; break; //get cFX
     case 7:       cpFX = iicTable[1]; break; //get cpFX (merge into message case #6)
     

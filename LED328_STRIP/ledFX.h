@@ -102,7 +102,8 @@ void iterator() { // realy bad example of on frame actions
  * Old Patterns from DV2
  */
 void theLights() {
-  runCheck(50);
+  runCheck(10);
+  fadeToBlackBy(&(leds[0]), NUM_LEDS, 10);
   int pos = random16(0, NUM_LEDS);
   colorIndex = (colorIndex + 10);
   if (colorIndex > 254) {
@@ -126,6 +127,7 @@ void rainbow() {
 }
 void sinelon() {
    runCheck(10);
+  fadeToBlackBy(&(leds[0]), NUM_LEDS, 20);
   int pos = beatsin16( 13, 0, NUM_LEDS - 1 ) ;
   colorIndex++;
   if (colorIndex > 254) { // maybe further reduce by making colorIndex cycHue? Or a global timer
@@ -133,17 +135,21 @@ void sinelon() {
   }
   leds[pos] = ColorFromPalette( cPal, colorIndex, brightness, currentBlending);
 }
+
 void bpm() {
   runCheck(10);
-  uint8_t beat = beatsin8( fxDelay, 64, 255);
+  uint8_t beat = beatsin8( 62, 64, 255);
   for (int i = 0; i < NUM_LEDS; i++) { 
-    colorIndex++; //not necessary...
-    if (colorIndex > 254) {//not necessary...
+    EVERY_N_MILLISECONDS(20){
+     colorIndex++; //not necessary...
+     if (colorIndex > 254) {//not necessary...
       colorIndex = 0;//not necessary...
-      leds[i] = ColorFromPalette(cPal, colorIndex + (i * 2), beat - 0 + (i * 10));
-      }
-  }
+     }
+    }
+    leds[i] = ColorFromPalette(cPal, colorIndex + (i * 2), beat - 0 + (i * 10));
+    }
 }
+
 
 void bouncingTrails(){ // this is some messy code - will come back to it...
    runCheck(10);
@@ -211,11 +217,10 @@ void bouncingTrails(){ // this is some messy code - will come back to it...
   }
   lastCount=counter;
 }
-
+/* NOT WORK!
 void palLoop() {
-  runCheck(3);
+  runCheck(30);
   for(int j=0;j<3;j++){
-    if(cycleFlag[0]){  
       for(int k=0;k<256;k++){
         switch(j){
           case 0: setAll(k,0,0); break;
@@ -223,22 +228,20 @@ void palLoop() {
           case 2: setAll(0,0,k); break;
         }
       }
-      cycleFlag[0]=!cycleFlag[0];
-    }
-    else {
-      for(int k=255;k>=0;k--){
+    for(int k=255;k>=0;k--){
         switch(j){
-        case 0: setAll(k,0,0); break;
-        case 1: setAll(0,k,0); break;
-        case 2: setAll(0,0,k); break;
+          case 0: setAll(k,0,0); break;
+          case 1: setAll(0,k,0); break;
+          case 2: setAll(0,0,k); break;
         }
       }
-      cycleFlag[0]=!cycleFlag[0];
-    }
   }
 }
+*/ 
 
+///also not working!
 void BouncingBalls(byte red, byte green, byte blue, int BallCount) {
+  runCheck(50);
   float Gravity = -9.81;
   int StartHeight = 1;
   float Height[BallCount];
@@ -336,6 +339,7 @@ void rider() {
 }
 
 void colourFill() {
+   fadeToBlackBy(&(leds[0]), NUM_LEDS, 20); // keep or not?
   static byte currentColor = 0;
   static byte currentRow = 0;
   static byte currentDirection = 0;
@@ -382,7 +386,7 @@ void slantBars() {
   runCheck(5);
   for (byte x = 0; x < kMatrixWidth; x++) {
     for (byte y = 0; y < kMatrixHeight; y++) {
-      leds[XY(x, y)] = CHSV(cycHue, 255, quadwave8(x * 32 + y * 32 + slantPos));
+      leds[XY(x, y)] = CHSV(cycHue, 255, quadwave8(x * 32 + y + slantPos));
     }
   }
   slantPos -= 4;
@@ -483,14 +487,14 @@ void fire()
 {
   static byte heat[NUM_LEDS];
     for( int i = 0; i < NUM_LEDS; i++) {
-      heat[i] = qsub8( heat[i],  random8(0, ((COOLING * 10) / NUM_LEDS) + 2));
+      heat[i] = qsub8( heat[i],  random(0, ((COOLING * 10) / NUM_LEDS) + 2));
     }
     for( int k= NUM_LEDS - 1; k >= 2; k--) {
       heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
     }
-    if( random8() < SPARKING ) {
-      int y = random8(7);
-      heat[y] = qadd8( heat[y], random8(160,255) );
+    if( random() < SPARKING ) {
+      int y = random(7);
+      heat[y] = qadd8( heat[y], random(160,255) );
     }
     for( int j = 0; j < NUM_LEDS; j++) {
       byte colorindex = scale8( heat[j], 240);
@@ -552,7 +556,9 @@ void strobeCore(uint8_t dashperiod, uint8_t dashwidth, int8_t  dashmotionspeed, 
   strobeDraw( sStartPosition, NUM_LEDS - 1, dashperiod, dashwidth, sStartHue, huedelta, kSaturation, kValue);
 }
 void simpleStrobe () {
-  const uint8_t kStrobeCycleLength = 6; // light every Nth frame
+  runCheck(20);
+  fill_solid( leds, NUM_LEDS, CRGB::Black);
+  const uint8_t kStrobeCycleLength = 4; // light every Nth frame
   static uint8_t sStrobePhase = 0;
   sStrobePhase = sStrobePhase + 1;
   colorIndex++;
@@ -573,7 +579,7 @@ void simpleStrobe () {
     uint8_t cycle = beat8(2); // two cycles per minute
     uint8_t easedcycle = ease8InOutCubic( ease8InOutCubic( cycle));
     uint8_t wavecycle = cubicwave8( easedcycle);
-    // uint8_t hueShift = 0; // NO SHIFT OF HUE IN COLOUR (we should rebuild in RGB...)
+    //uint8_t hueShift = 0; // NO SHIFT OF HUE IN COLOUR (we should rebuild in RGB...)
     uint8_t hueShift = scale8( wavecycle, 130); // METHOD HOW HUE VALUE SHIFTS
     uint8_t strobesPerPosition = 2; // try 1..4
     strobeCore( dashperiod, dashwidth, dashmotionspeed, strobesPerPosition, hueShift);
