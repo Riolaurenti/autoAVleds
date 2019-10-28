@@ -3,21 +3,19 @@
   * Parser - Receives PJON and converts to I2C
   */
 void parser() { 
+  int comma = string.indexOf(",");
   while(string.length() >= 1){
-    String type = string.substring(0); // get value at pos #1 - Message Type
-    int msg = type.toInt(); 
-    String value = string.substring(1); // get value at pos #2 - Value of Message
-    int val = value.toInt(); // change to Int
-    DPRINT(msg);
-    DPRINT(val); 
+    //Bypass all below and just forward string to iic
+
+    
+    String type = string.substring(0, comma); // get value at pos #1 - Message Type
+    DPRINT("type = "); DPRINTLN(type);
+    String value = string.substring(comma+1,3); // get value at pos #2 - Value of Message
+    DPRINT("Value = ");    DPRINTLN(value); 
     DFLUSH();
-    for(int i=0;i<4;i++){ // add how to address MCU's here (Flags)
-        Wire.beginTransmission(i); // choose destination
-        Wire.write(msg); // add message type
-        Wire.write(val); // add value
-        Wire.endTransmission(); // send on next iteration
-      }
+    //iic(); 
     }
+    
   string = ""; // empty the string!
 };
 
@@ -48,13 +46,15 @@ void error_handler(uint8_t code, uint16_t data, void *custom_pointer) {
 void receiver_handler(uint8_t *payload, uint16_t length, const PJON_Packet_Info &packet_info) {
   const  char * arr = payload; // Not a pointer now.... !
   string.concat(arr); // addd it to our string
-  parser(); // whats it say then ?? 
-  // prints it to the console letter by letter
+  iic(string);
+  /*
+ // parser(); 
   DPRINT("Received: ");
   for(uint16_t i = 0; i < length; i++) {
     DPRINT((char)payload[i]);
     DPRINT(" ");
   }
   DPRINTLN();
-  DFLUSH();
-};
+  */
+  string = "";
+ };

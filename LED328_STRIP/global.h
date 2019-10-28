@@ -19,6 +19,8 @@ uint8_t noise[MAX_DIMENSION][MAX_DIMENSION];
 #define SPARKING 120 //(50-200)
 bool gReverseDirection = false;
 
+String received;
+
 bool cycleFlag[] = {};
 boolean fxInit = false; // indicates if a pattern has been recently switched
 uint16_t fxDelay = 0; // time between automatic effect changes

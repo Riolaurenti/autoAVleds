@@ -89,7 +89,7 @@ void loop() {
     // run the currently selected effect every effectDelay milliseconds
     if (cMil - fxMil > fxDelay) {
       fxMil = cMil;
-      fxList[11](); // run the selected effect function
+      fxList[cFX](); // run the selected effect function
       }
   }
   if(Mode==1){ // when pulse on..
@@ -109,16 +109,57 @@ void loop() {
   FastLED.show(); // send the contents of the led memory to the LEDs
 }
 
+void parseIIC(){
+  int comma = received.indexOf(',');
+  String typeN = received.substring(0,comma);
+  String valN = received.substring(comma+1,5);
+  int t = typeN.toInt();
+  int v = valN.toInt();
+  switch(t){
+    case 1: {  cur_Step = v; DPRINT("CLK = "); DPRINTLN(cur_Step);  }    break;
+    case 2: {  
+      DPRINT("MODE");
+      if(v==1) Mode = 0;
+      if(v==2) Mode = 1;
+    }   break;
+    case 5: {
+      cPalVal = v; DPRINT("cPal = "); DPRINTLN(v);
+      selPal();  
+    }   break;
+    case 6: {  cFX = v;    }    break;
+    case 7: {  cpFX = v;    }    break;
+    case 10:      pFlag[0] = 1;      break;
+    case 11:      pFlag[1] = 1;      break;
+    case 12:      pFlag[2] = 1;      break;
+    case 13:      pFlag[3] = 1;      break;
+    case 14:      pFlag[4] = 1;      break;
+    case 15:      pFlag[5] = 1;      break;
+    case 16:      pFlag[6] = 1;      break;
+    case 17:      pFlag[7] = 1;      break;
+  }
+  //DPRINT("t = ");DPRINTLN(t);DPRINT("v = ");DPRINTLN(v);
+}
 
+void eHandler(int aa){
+  while (Wire.available()) {    
+     char c = Wire.read();             // receive a byte as character
+     received.concat(c);          //Add the character to the received string
+     } 
+   parseIIC();
+   DPRINTLN(received);
+   received = "";
+}
+ 
+/* old
 void eHandler(int aa) {
   int i =0;
   while (Wire.available()) {
-  iicTable[i] = Wire.read();    // receive byte as an integer
+  iicTable[i] = Wire.read();// receive byte as an integer
   i=i+1;
   //DPRINT("IC = ");
-  //DPRINTLN(iicTable[i]);
+  DPRINTLN(iicTable[i]);
   }
-  //DPRINTLN();
+  DPRINTLN();
   switch (iicTable[0]) {
     case 1:       Mode = 0;      break;
     case 2:      Mode = 1;      break;
@@ -156,3 +197,4 @@ void eHandler(int aa) {
     
   }
 }
+*/
