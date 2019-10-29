@@ -52,20 +52,3 @@ void receiver_handler(uint8_t *payload, uint16_t length, const PJON_Packet_Info 
   DFLUSH();
   
 };
-
-/*
-// PJON Reciver 
-void receiver_function(uint8_t *payload, uint16_t length, const PJON_Packet_Info &packet_info) {
- 
-  int id = int(packet_info.sender_id);
-  String toParse = payload; // conver to String
-  parseMsg(id, toParse); // Shunt off to the PArser
-  //DPRINTLN("MESSAGE!!");
-} // Thats it!
-*/
-
-void tellMasterAboutSelf(){ 
-  const char pkt[regString.length()+1]; // Create array
-  regString.toCharArray(pkt,regString.length()); // Convert string to Char[]
-  bus.send(254,pkt,regString.length()+1); // Send the packet to master. 
-};

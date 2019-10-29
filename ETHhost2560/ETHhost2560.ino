@@ -35,10 +35,8 @@ void setup() {
   DPRINTLN(Ethernet.localIP());
 }
 
-void loop() {
-  
-  routeOSC();
-  
+void loop() {  
+  routeOSC(); 
 }
 /*
  * Route all Incoming OSC Bundles here
@@ -52,17 +50,7 @@ void routeOSC() {
       bundleIN.route("/m", MODE);
       bundleIN.route("/CLK", CLK);
       bundleIN.route("/p", onPulse);
-//      bundleIN.route("/q", onPulse1);
       bundleIN.route("/v", VOL);
-
-      bundleIN.route("/aA", ARRA);
-      bundleIN.route("/aB", ARRB);
-      bundleIN.route("/aC", ARRC);
-      bundleIN.route("/aD", ARRD);
-      //bundleIN.route("/aE", ARRA);
-      //bundleIN.route("/aF", ARRB);
-      //bundleIN.route("/aG", ARRC);
-      //bundleIN.route("/aH", ARRD);
      }
    }
 }
