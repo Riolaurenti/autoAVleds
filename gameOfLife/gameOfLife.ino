@@ -21,7 +21,7 @@
 
 cLEDMatrix< -MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX, MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_ZIGZAG_BLOCKS> leds;
 
-include "gameOfLife.h"
+#include "gameOfLifeCore.h"
 unsigned long cMil;
 unsigned long runTimer = 1000;
 
@@ -31,12 +31,14 @@ void setup(){
 	FastLED.addLeds<WS2812B, DATA2_PIN, GRB>(leds[0], 192, 192);
 	FastLED.setBrightness(255);
 	FastLED.clear();
+  cMil=millis();
+  Serial.println("setup complete");
 }
 
 void loop(){
-	cMil=millis();
-	if (cMil>runTimer){
+  	if ((millis()-cMil)>runTimer){
+      cMil+=runTimer;
+      //Serial.println("timer triggered");
 		gameOfLife();
-		cMil=0;
 	}
 }
