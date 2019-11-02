@@ -29,7 +29,7 @@ void setup() {
   FastLED.addLeds<WS2812B, DATA2_PIN, GRB>(leds[0], 192, 192);
   FastLED.setBrightness(64);
   currentBlending = LINEARBLEND;
-  currentPalette = Red_blueD1;
+  currentPalette = Red_blue_greenD1;
   FastLED.clear();
 }
 

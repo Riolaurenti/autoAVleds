@@ -11,7 +11,9 @@ void sinelon() {
   fadeToBlackBy(&(leds(0)), NUM_LEDS, myFadeOut);
   int posX = beatsin16( 200, 0, MATRIX_HEIGHT - 1 ) ;
   int posY = beatsin16( 12, 0, MATRIX_WIDTH - 1 ) ;
+  EVERY_N_MILLIS(50){
   colorIndex++;
+  }
   if (colorIndex > 254) {
     colorIndex = 0;
   }
