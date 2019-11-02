@@ -21,6 +21,7 @@ bool gReverseDirection = false;
 int ourAddr = ADDR-2; // Our IIC address holder for logic work.
 
 CRGBPalette16 cPal(RainbowColors_p); // global palette storage
+CRGB cPalGo[4] = {CRGB::White, CRGB::Blue, CRGB::Green,CRGB::Red}; // global palette storage
 int Zone = 0; //Change to cur MCU#
 byte zVals[4] = {}; // Zone Value (get bits) used for pattern store
 int subZone[4] = {}; // Change Strip
@@ -33,6 +34,7 @@ int LEDEnd = 0;//this holds the number of the last LED in the arry to start prin
 int NoLEDs = 0;//this holds how many LED's we need to address. (may be a better way of doin this ToDo)
 int patternStore[NUM_STRIPS+1];//this array holds the pattern number for each strip.
 int cPalVal = 0;
+
 byte cFX = 0; // index to the currently running effect
 byte cpFX = 0; // index to the currently running effect
 byte cBright = STARTBRIGHT; // 0-255 will be scaled to 0-MAXBRIGHTNESS

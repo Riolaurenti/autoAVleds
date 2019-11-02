@@ -56,7 +56,7 @@ void randCfx() {
 }
 //PulseFX
 void randCpfx() {
-  cpFX = random(2); // make no# patterns in pulse mode
+  cpFX = random(5); // make no# patterns in pulse mode
   String CPFX = String(cpFX);
   String mOut = "7," + CPFX;
   char outA[mOut.length()+2]; 

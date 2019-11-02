@@ -13,49 +13,11 @@ void runCheck(int val){
   * Simple Momentary Tricks
   */
 void flash(){ // Single Channel Pulse Example with hard colour choice
-  runCheck(30);
+  runCheck(5);
   if (pFlag[0]==1){
    for (int x = 0; x < kMatrixWidth; x++) {
     for (int y = 0; y < kMatrixHeight; y++) {
-      leds[XY(x,y)] = CRGB::White;
-      } 
-    }
-  }
-  pFlag[0]=0;
-}
-void mFlash(){ // Multi Channel Pulse Example with hard colour choice
-  runCheck(30);
-  for( int i = 0 ; i < kMatrixHeight;i++){
-     if (pFlag[i]==1){
-        for (int x = 0; x < kMatrixWidth; x++) {
-          for (int y = 0; y < kMatrixHeight; y++) {
-            leds[XY(x+(i*kMatrixWidth),i)] = CRGB::White;
-           } 
-        }
-      }
-   pFlag[i]=0;
-   }
-}
-void zoneFlash(){ // remove, change call method.
-  runCheck(30);
-  if (pFlag[0]==1){
-   for (int x = 0; x < kMatrixWidth; x++) {
-    for (int y = 0; y < kMatrixHeight; y++) {
-      if(subZone[0]==1) leds[XY(x,0)] = CRGB::White;
-      if(subZone[1]==1) leds[XY(x,1)] = CRGB::Blue;
-      if(subZone[2]==1) leds[XY(x,2)] = CRGB::Red;
-      if(subZone[3]==1) leds[XY(x,3)] = CRGB::Green;
-      } 
-    }
-  }
-  pFlag[0]=0;
-}
-void cFlash(CRGB COL){ // Single Channel Pulse Example with hard colour choice
-  runCheck(30);
-  if (pFlag[0]==1){
-   for (int x = 0; x < kMatrixWidth; x++) {
-    for (int y = 0; y < kMatrixHeight; y++) {
-      leds[XY(x,y)] = COL;
+      leds[XY(x,y)] = CRGB::Purple;
       } 
     }
   }
@@ -75,25 +37,76 @@ void flashArray(){ // Multi-Channel Pulse Example single Strip.
       }      
    pFlag[i]=0;
   }
-  if(cFlag==1){ // Clock is added single blue LED
-        if(cur_Step<=NUM_LEDS-1){
+  if(cFlag==1){ // Clock is added single blue LED -- COME BACK HERE LATER
+        if(cur_Step<=NoLEDs-1){
             leds[cur_Step] = CRGB::Blue;
         }
     }
-   cFlag=0;   
+   //cFlag=0;   
 }
 
-void confet(){
+void mFlash(){ // Multi Channel Pulse Example with hard colour choice
   runCheck(30);
-  if (pFlag[0]==1){
-   for (int x = 0; x < kMatrixWidth; x++) {
-    for (int y = 0; y < kMatrixHeight; y++) {
-      leds[XY(random16(kMatrixWidth), random16(kMatrixHeight))] = ColorFromPalette(cPal, random16(255), 255); //CHSV(random16(255), 255, 255);
-      } 
-    }
+  for( int i = 0 ; i < kMatrixHeight;i++){
+     if (pFlag[i]==1){
+        for (int x = 0; x < kMatrixWidth; x++) {
+          leds[XY(x,i)] = CRGB::White;
+           } 
+        }
+      pFlag[i]=0;
   }
-  pFlag[0]=0;
 }
+
+void zoneFlash(){ // Call method works fine, attempt with full procedure..
+  runCheck(30);
+  for (int y = 0; y < kMatrixHeight; y++) {
+    if (pFlag[y]==1){
+       for (int x = 0; x < kMatrixWidth; x++) {
+          leds[XY(x,y)] = cPalGo[y];
+       } 
+    }
+  pFlag[y]=0;
+  }
+}
+
+void riderS() { //Single Dash on Pulse
+  static byte riderPos = 0;
+  if (fxInit == false) {
+    fxInit = true;
+    fxDelay = 2;
+    riderPos = 0;
+  }
+  for(int k=0;k<4;k++){
+  if(pFlag[k]==1){
+    for (byte x = 0; x < kMatrixWidth; x++) {
+      int brightness = abs(x * (256 / kMatrixWidth) - triwave8(riderPos) * 4 + 127) * 2;
+      if (brightness > 255) brightness = 255;
+        brightness = 255 - brightness;
+        CRGB riderColor = CHSV(cycHue, 255, brightness);
+        for (byte y = 0; y < kMatrixHeight; y++) {
+          leds[XY(x, k)] = riderColor;
+        }
+    }
+  riderPos++; // byte wraps to 0 at 255, triwave8 is also 0-255 periodic
+  if(riderPos>=64)riderPos=0;
+  }
+  pFlag[k]=0;
+}
+}
+
+void confet() {
+  runCheck(40);
+  for(int k=0;k<4;k++){
+    if (pFlag[k]==1){
+     for (int x = 0; x < kMatrixWidth; x++) {
+      leds[XY(random16(kMatrixWidth), k)] = ColorFromPalette(cPal, random16(255), 255); //CHSV(random16(255), 255, 255);
+     }
+    }
+  pFlag[k]=0;
+  }
+}
+
+/*
 void iterator() { // realy bad example of on frame actions
   runCheck(30);
   if(itX>=kMatrixWidth) itX=0;
@@ -105,7 +118,7 @@ void iterator() { // realy bad example of on frame actions
   pFlag[0]=0;
   itX++;
 }
-
+*/
 
 
 /*
@@ -116,8 +129,8 @@ void iterator() { // realy bad example of on frame actions
  */
 void theLights() {
   runCheck(10);
-  fadeToBlackBy(&(leds[0]), NUM_LEDS, 10);
-  int pos = random16(0, NUM_LEDS);
+  fadeToBlackBy(&(leds[LEDStart]), NoLEDs, 10);
+  int pos = random16(LEDStart, LEDEnd);
   colorIndex = (colorIndex + 10);
   if (colorIndex > 254) {
     colorIndex = 0;
@@ -129,7 +142,7 @@ void rainbow() {
   runCheck(1);
   static int pHue = 0;
   static int hueStore;
-    for (int i = 0; i < NUM_LEDS; i++) {
+    for (int i = 0; i < NoLEDs; i++) {
       pHue = i + cycHue;
       if (pHue > 255) {
          hueStore = pHue - 255;
@@ -140,8 +153,8 @@ void rainbow() {
 }
 void sinelon() {
    runCheck(10);
-  fadeToBlackBy(&(leds[0]), NUM_LEDS, 20);
-  int pos = beatsin16( 13, 0, NUM_LEDS - 1 ) ;
+  fadeToBlackBy(&(leds[LEDStart]), NoLEDs, 20);
+  int pos = beatsin16( 13, 0, NoLEDs - 1 ) ;
   colorIndex++;
   if (colorIndex > 254) { // maybe further reduce by making colorIndex cycHue? Or a global timer
     colorIndex = 0;
@@ -152,7 +165,7 @@ void sinelon() {
 void bpm() {
   runCheck(10);
   uint8_t beat = beatsin8( 62, 64, 255);
-  for (int i = 0; i < NUM_LEDS; i++) { 
+  for (int i = 0; i < NoLEDs; i++) { 
     EVERY_N_MILLISECONDS(20){
      colorIndex++; //not necessary...
      if (colorIndex > 254) {//not necessary...
@@ -288,7 +301,7 @@ void BouncingBalls(byte red, byte green, byte blue, int BallCount) {
           ImpactVelocity[i] = ImpactVelocityStart;
         }
       }
-      Position[i] = round( Height[i] * (NUM_LEDS - 1) / StartHeight);
+      Position[i] = round( Height[i] * (NoLEDs - 1) / StartHeight);
     }
  
     for (int i = 0 ; i < BallCount ; i++) {
@@ -352,7 +365,7 @@ void rider() {
 }
 
 void colourFill() {
-   fadeToBlackBy(&(leds[0]), NUM_LEDS, 20); // keep or not?
+   fadeToBlackBy(&(leds[LEDStart]), NoLEDs, 20); // keep or not?
   static byte currentColor = 0;
   static byte currentRow = 0;
   static byte currentDirection = 0;
@@ -499,22 +512,22 @@ void fillNoise8() {
 void fire()
 {
   static byte heat[NUM_LEDS];
-    for( int i = 0; i < NUM_LEDS; i++) {
-      heat[i] = qsub8( heat[i],  random(0, ((COOLING * 10) / NUM_LEDS) + 2));
+    for( int i = 0; i < NoLEDs; i++) {
+      heat[i] = qsub8( heat[i],  random(0, ((COOLING * 10) / NoLEDs) + 2));
     }
-    for( int k= NUM_LEDS - 1; k >= 2; k--) {
+    for( int k= NoLEDs - 1; k >= 2; k--) {
       heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
     }
     if( random() < SPARKING ) {
       int y = random(7);
       heat[y] = qadd8( heat[y], random(160,255) );
     }
-    for( int j = 0; j < NUM_LEDS; j++) {
+    for( int j = 0; j < NoLEDs; j++) {
       byte colorindex = scale8( heat[j], 240);
       CRGB color = ColorFromPalette( cPal, colorindex);
       int pixelnumber;
       if( gReverseDirection ) {
-        pixelnumber = (NUM_LEDS-1) - j;
+        pixelnumber = (NoLEDs-1) - j;
       } else {
         pixelnumber = j;
       }
@@ -535,7 +548,7 @@ static void strobeDraw( uint8_t startpos, uint16_t lastpos, uint8_t period, uint
     for ( uint8_t w = 0; w < width; w++) {
       leds[pos] = ColorFromPalette( cPal, colorIndex, brightness, currentBlending);
       pos++;
-      if ( pos >= NUM_LEDS) {
+      if ( pos >= NoLEDs) {
         break;
       }
     }
@@ -566,11 +579,11 @@ void strobeCore(uint8_t dashperiod, uint8_t dashwidth, int8_t  dashmotionspeed, 
   }
   const uint8_t kSaturation = 208; // WHITE >> CURRENT COLOUR control (def 208)
   const uint8_t kValue = 200; // Brightness??
-  strobeDraw( sStartPosition, NUM_LEDS - 1, dashperiod, dashwidth, sStartHue, huedelta, kSaturation, kValue);
+  strobeDraw( sStartPosition, NoLEDs - 1, dashperiod, dashwidth, sStartHue, huedelta, kSaturation, kValue);
 }
 void simpleStrobe () {
   runCheck(20);
-  fill_solid( leds, NUM_LEDS, CRGB::Black);
+  fill_solid( leds, NoLEDs, CRGB::Black);
   const uint8_t kStrobeCycleLength = 4; // light every Nth frame
   static uint8_t sStrobePhase = 0;
   sStrobePhase = sStrobePhase + 1;
