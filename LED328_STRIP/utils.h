@@ -1,4 +1,37 @@
+void get_bits(int type, int val){
+  for(int j=0;j<4;j++){
+    byte i = bitRead(val,j);
+    if(type==8 && j==ourAddr){      Zone = i;      }
+    if(type==9 ){      subZone[j] = i;    }
+    if(type==20){      zVals[j]=i;      }
+    //DPRINT(i);  
+    DPRINT(subZone[i]);
+  }  
+  DPRINTLN();
+}
 
+void setLEDs() {//this function sets the boundares for LED addressing.
+  if (stripMode == 1) {
+    NoLEDs = NUM_LEDS_PER_STRIP;//if we are adressing individual strips  the number of LEDs to change will be equal to the number of LEDs in one strip.
+    for(int i=1;i<NUM_STRIPS+1;i++){
+      if ((stripMode == 1) && (stripNumber == i)) {//if it is equal to the strip we wish to address, set the start and end number of the strip.
+        LEDEnd = (NUM_LEDS_PER_STRIP * i);
+        LEDStart = ((NUM_LEDS_PER_STRIP * i) - (NUM_LEDS_PER_STRIP));
+      }
+    }
+  }
+  if (stripMode == 0) {//if addressing all strips as one.
+    NoLEDs = NUM_LEDS;//number of LEDs is equal to the total number of LEDs
+    LEDStart = 0;//set start and end possition in array
+    LEDEnd = NUM_LEDS;
+  }   
+}
+/*
+ * When stripNumber changes... / patternNumber 
+ * patternStore[stripNumber]=patternNumber;
+ */
+
+ 
 // Increment the global hue value for functions that use it
 byte cycHue = 0;
 byte cycHueCount = 0;
@@ -80,8 +113,8 @@ void selPal() {
     case 25:      cPal = saga_15_gp;      break;
     case 26:      cPal = saga_17_gp;      break;    
     }
-    DPRINT("pallete = ");
-    DPRINTLN(cPalVal);
+   // DPRINT("pallete = ");
+   // DPRINTLN(cPalVal);
 }
 /*
 // Pick a random palette from a list

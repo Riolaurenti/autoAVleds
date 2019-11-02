@@ -36,7 +36,20 @@ void mFlash(){ // Multi Channel Pulse Example with hard colour choice
    pFlag[i]=0;
    }
 }
-
+void zoneFlash(){ // remove, change call method.
+  runCheck(30);
+  if (pFlag[0]==1){
+   for (int x = 0; x < kMatrixWidth; x++) {
+    for (int y = 0; y < kMatrixHeight; y++) {
+      if(subZone[0]==1) leds[XY(x,0)] = CRGB::White;
+      if(subZone[1]==1) leds[XY(x,1)] = CRGB::Blue;
+      if(subZone[2]==1) leds[XY(x,2)] = CRGB::Red;
+      if(subZone[3]==1) leds[XY(x,3)] = CRGB::Green;
+      } 
+    }
+  }
+  pFlag[0]=0;
+}
 void cFlash(CRGB COL){ // Single Channel Pulse Example with hard colour choice
   runCheck(30);
   if (pFlag[0]==1){

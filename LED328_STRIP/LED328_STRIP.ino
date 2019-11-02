@@ -4,10 +4,7 @@
  * DO NOT FORGET TO UPDATE YOUR XY MAPPINGS!
  */
 
-#define LED_PIN        3
-#define LED_PIN2       4
-#define LED_PIN3       5
-#define LED_PIN4       6
+#define ADDR           2 
 
 #include "XYmap.h"
 #include "global.h"
@@ -116,18 +113,43 @@ void parseIIC(){
   int t = typeN.toInt();
   int v = valN.toInt();
   switch(t){
-    case 1: {  cur_Step = v; DPRINT("CLK = "); DPRINTLN(cur_Step);  }    break;
+    case 1: {  cur_Step = v; }    break;
     case 2: {  
       DPRINT("MODE");
-      if(v==1) Mode = 0;
-      if(v==2) Mode = 1;
+      if(v==1) Mode = 0; // autoPilot
+      if(v==2) Mode = 1; // Pulse Mode
     }   break;
+    
     case 5: {
-      cPalVal = v; DPRINT("cPal = "); DPRINTLN(v);
+      cPalVal = v; 
       selPal();  
     }   break;
-    case 6: {  cFX = v;    }    break;
+    case 6: {  
+      int lastStripNumber=stripNumber;
+      if(stripMode==0){
+        setLEDs();
+        cFX = v;
+        }
+      if(stripMode != 0) {
+        for(int i=1;i<NUM_STRIPS+1;i++) {
+          stripNumber=i;
+          setLEDs();
+          //cFX = v;
+          for(int j=0;j<4;j++){
+            if(subZone[j]==1){
+               patternStore[j] = v;
+           }
+          }
+          patternNoArray=patternStore[i];  
+        }
+      }
+      stripNumber = lastStripNumber;
+    } break;
     case 7: {  cpFX = v;    }    break;
+    
+    case 8: {      byte Go = v; get_bits(8,Go); } break;
+    case 9: {      byte Go = v; get_bits(9,Go); } break;
+    
     case 10:      pFlag[0] = 1;      break;
     case 11:      pFlag[1] = 1;      break;
     case 12:      pFlag[2] = 1;      break;
@@ -136,6 +158,20 @@ void parseIIC(){
     case 15:      pFlag[5] = 1;      break;
     case 16:      pFlag[6] = 1;      break;
     case 17:      pFlag[7] = 1;      break;
+
+    case 20:      {
+      for(int i=0;i<4;i++){
+        if(subZone[i]==1){
+          patternStore[i] = cFX;
+        }
+      }
+    }   break;
+    case 21: {  
+      if(v==1) { stripMode = 0; setLEDs(); DPRINTLN("LEDS INDIVIDUAL MODE"); } // All Strip Mode
+      if(v==2) { stripMode = 1; setLEDs(); 
+        
+      DPRINTLN("LEDS STRIP MODE"); }  // Individual Strip Mode
+    }   
   }
   //DPRINT("t = ");DPRINTLN(t);DPRINT("v = ");DPRINTLN(v);
 }
@@ -146,55 +182,7 @@ void eHandler(int aa){
      received.concat(c);          //Add the character to the received string
      } 
    parseIIC();
-   DPRINTLN(received);
+   //DPRINTLN(received);
    received = "";
 }
  
-/* old
-void eHandler(int aa) {
-  int i =0;
-  while (Wire.available()) {
-  iicTable[i] = Wire.read();// receive byte as an integer
-  i=i+1;
-  //DPRINT("IC = ");
-  DPRINTLN(iicTable[i]);
-  }
-  DPRINTLN();
-  switch (iicTable[0]) {
-    case 1:       Mode = 0;      break;
-    case 2:      Mode = 1;      break;
-    case 3:    { // receive current step integer from clock
-      cFlag=1;
-      cur_Step=iicTable[1]; 
-      break;
-    }
-    case 4: {  // Is this Controller Primary or Secondary?
-      for(int i=0;i<sizeof(ioRule);i++){
-        ioRule[i]=iicTable[i+1];
-        iAm=ioRule[0]; //(use to change Mode if non auto is on - dont be fooled by current clk control)
-        Mode = iAm ; //Temporary placeholder, use if(auto mode = 0 and zone ctrl = 1)
-        //DPRINT(ioRule[i]);
-      }
-      break;
-    }
-    case 5:      {
-      cPalVal = iicTable[1];
-      selPal();
-      //DPRINT("OK");
-    } break; //get cPal
-    
-    case 6:       cFX = iicTable[1]; break; //get cFX
-    case 7:       cpFX = iicTable[1]; break; //get cpFX (merge into message case #6)
-    
-    case 10:      pFlag[0] = 1;      break;
-    case 11:      pFlag[1] = 1;      break;
-    case 12:      pFlag[2] = 1;      break;
-    case 13:      pFlag[3] = 1;      break;
-    case 14:      pFlag[4] = 1;      break;
-    case 15:      pFlag[5] = 1;      break;
-    case 16:      pFlag[6] = 1;      break;
-    case 17:      pFlag[7] = 1;      break;
-    
-  }
-}
-*/

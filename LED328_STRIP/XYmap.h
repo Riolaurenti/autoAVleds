@@ -2,7 +2,7 @@
  * Mapping for 4 x 42 LED strips - Change accordingly, cba to write full ifDef sh*t.. later.
  */
 
-// /*
+ /*
 // Params for width and height
 const uint8_t kMatrixWidth = 42;
 const uint8_t kMatrixHeight = 1;
@@ -24,9 +24,9 @@ uint8_t XY (uint8_t x, uint8_t y) {
   uint8_t j = XYTable[i];
   return j;
 }
-// */
+ */
 
-/*
+// /*
 // Params for width and height
 const uint8_t kMatrixWidth = 42;
 const uint8_t kMatrixHeight = 4;
@@ -51,4 +51,4 @@ uint8_t XY (uint8_t x, uint8_t y) {
   uint8_t j = XYTable[i];
   return j;
 }
-*/
+// */

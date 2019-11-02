@@ -22,7 +22,16 @@ void MODE(OSCMessage &msg, int addrOffset ){ // get float from clock #1 - Receiv
   char outMode[mOut.length()+2];
   mOut.toCharArray(outMode, mOut.length()+1);
   iic(outMode);
-  }
+}
+void STRIPMODE(OSCMessage &msg, int addrOffset ){ // get float from clock #1 - Receive int/pulse
+  int e = msg.getFloat(0);
+  String strVal = String(e);
+  // keep a record on master here?
+  String mOut = "21," + strVal;
+  char outMode[mOut.length()+2];
+  mOut.toCharArray(outMode, mOut.length()+1);
+  iic(outMode);
+}
 
 // there is a much cleaner way to do this... later.
 void onPulse(OSCMessage &msg, int addrOffset ){ // get float from clock #1 - Receive int/pulse
