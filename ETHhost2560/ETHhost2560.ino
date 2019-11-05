@@ -52,6 +52,9 @@ void routeOSC() {
       bundleIN.route("/CLK", CLK);
       bundleIN.route("/p", onPulse);
       bundleIN.route("/v", VOL);
+      bundleIN.route("/lZ", CUSTOM);
+      bundleIN.route("/cFX", CUSTOM);
+      bundleIN.route("/sM", CUSTOM);
      }
    }
 }

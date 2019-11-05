@@ -79,16 +79,16 @@ void countBars() {
   DPRINTLN(tClk);
   for (int i = 0; i < 16 ; i++) {
     if (clk == 8 * i) {
-      randCfx();
-      randCpfx();
+      if(randomFX==1)randCfx();
+      if(randomPFX==1)randCpfx();
       //DPRINT("  cFX = ");
       //DPRINTLN(cFX);
     }
   }
   for (int i = 0; i < 16 ; i++) {
     if (clk == 4 * i) {
-      randPal();
-      randZone(); //test
+      if(randomPalette==1)randPal();
+      if(randomZone==1)randZone(); //test
       DPRINT("  Zone = ");
       DPRINTLN(Zone);
     }
