@@ -3,7 +3,7 @@
 #define LED_PIN3       4
 #define LED_PIN4       5
 #define NUM_STRIPS     4 
-#define NUM_PER_STRIP 42 
+#define NUM_LEDS_PER_STRIP 42 
 
 #define COLOR_ORDER    GRB
 #define CHIPSET        WS2812B
@@ -12,28 +12,26 @@
 #define cTime 15000
 #define hTime 30
 uint8_t brightness = 64;
+
 #define STROBE_BEATS_PER_MINUTE 97.5
+#define COOLING  55 // fire (20-100)
+#define SPARKING 120 //(50-200)
+bool gReverseDirection = false;
 
 int ourAddr = ADDR-2; // Our IIC address holder for logic work.
 
 CRGBPalette16 cPal(RainbowColors_p); // global palette storage
-//CRGB cPalGo[4] = {CRGB::White, CRGB::Blue, CRGB::Green,CRGB::Red}; // global palette storage
+CRGB cPalGo[4] = {CRGB::White, CRGB::Blue, CRGB::Green,CRGB::Red}; // global palette storage
 int Zone = 0; //Change to cur MCU#
-byte zVals[5] = {}; // Zone Value (get bits) used for pattern store
-byte subZone[4] = {}; // Change Strip
+byte zVals[4] = {}; // Zone Value (get bits) used for pattern store
+int subZone[4] = {}; // Change Strip
+int subZoneMem[4] = {}; // Change Strip
 int iicTable[8] = {}; // holder for iic array message (reduce to 8)
 byte stripMode = 0;
-byte curStrip = 0;
-int nLED;
-int sLED;
-int eLED;
-int pArr[NUM_STRIPS] = {};
 int cPalVal = 0;
 
-int patternStore[NUM_STRIPS+1];//this array holds the pattern number for each strip.
-
-volatile byte cFX = 0; // index to the currently running effect
-volatile byte cpFX = 0; // index to the currently running effect
+byte cFX = 0; // index to the currently running effect
+byte cpFX = 0; // index to the currently running effect
 byte cBright = STARTBRIGHT; // 0-255 will be scaled to 0-MAXBRIGHTNESS
 
 int cur_Step = 0;
@@ -45,9 +43,10 @@ int Solo = 0; // host auto / solo auto
 int ioRule[] = {0,0,0,0,0}; // Rule Holder for Primary/Secondary MCU
 
 String received; 
+bool cycleFlag[] = {}; 
 boolean fxInit = false; // indicates if a pattern has been recently switched
 uint16_t fxDelay = 0; // time between automatic effect changes
-
+uint16_t FXdel = 0;
 unsigned long fxMil = 0; // store the time of last effect function run
 unsigned long cycMil = 0; // store the time of last effect change
 unsigned long cMil; // store current loop's millis value

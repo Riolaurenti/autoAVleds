@@ -3,29 +3,13 @@ void get_bits(int type, int val){
     byte i = bitRead(val,j);
     if(type==8 && j==ourAddr){      Zone = i;      }
     if(type==9 ){      subZone[j] = i;    }
-    //if(type==20){      zVals[j]=i;      }
-    DPRINT(i);  
+    if(type==20){      zVals[j]=i;      }
+    //DPRINT(i);  
+    DPRINT(subZone[i]);
   }  
   DPRINTLN();
-  DPRINT(subZone[0]);DPRINT(subZone[1]);DPRINT(subZone[2]);DPRINT(subZone[3]); DPRINTLN();
 }
-void setStripMode(){
-  if(stripMode){
-    
-    nLED=NUM_PER_STRIP;
-    for(int i=1;i<NUM_STRIPS;i++){
-      if(curStrip==i){
-        sLED = (NUM_PER_STRIP*i);
-        eLED = (NUM_PER_STRIP*(i+1));
-       }
-    }
-  }
-  else {
-    nLED = NUM_LEDS;
-    sLED = 0;
-    eLED = LAST_VISIBLE_LED;
-  }
-}
+
 
 /*
  * When stripNumber changes... / patternNumber 
@@ -59,6 +43,11 @@ void setPixel(int Pixel, byte red, byte green, byte blue){
 }
 // Fade every LED in the array by a specified amount
 void fadeAll(byte fadeIncr) {
+  for (byte i = 0; i < NUM_LEDS; i++) {
+    leds[i] = leds[i].fadeToBlackBy(fadeIncr);
+  }
+}
+void fadeCustom(byte fadeIncr) {
   for (byte i = 0; i < NUM_LEDS; i++) {
     leds[i] = leds[i].fadeToBlackBy(fadeIncr);
   }
@@ -112,3 +101,93 @@ void selPal() {
    // DPRINT("pallete = ");
    // DPRINTLN(cPalVal);
 }
+/*
+// Pick a random palette from a list
+void selectRandomPalette() {
+  switch(random8(26)) {
+    case 0:    cPal = CloudColors_p;
+    break;
+    case 1:     cPal = LavaColors_p;
+    break;
+    case 2:    cPal = OceanColors_p;
+    break;
+    case 4:    cPal = ForestColors_p;
+    break;
+    case 5:    cPal = RainbowColors_p;
+    break;    
+    case 6:    cPal = PartyColors_p;
+    break;    
+    case 7:    cPal = HeatColors_p;
+    break;
+    case 8:    cPal = Pastel1_08_gp;
+    break;
+    case 9:    cPal = Paired_08_gp;
+    break;
+    case 10:    cPal = Dark2_08_gp;
+    break;
+    case 11:    cPal = RdYlGn_08_gp;
+    break;
+    case 12:    cPal = RdYlBu_08_gp;
+    break;
+    case 13:    cPal = RdBu_08_gp;
+    break;
+    case 14 :    cPal = PuOr_08_gp;
+    break;
+    case 15:    cPal = PRGn_08_gp;
+    break;
+    case 16:    cPal = Fuschia_8_gp;
+      break;
+    case 17:      cPal = saga_07_gp;
+      break;
+    case 18:      cPal = saga_08_gp;
+      break;
+    case 19:      cPal = saga_09_gp;
+      break;
+    case 20:      cPal = saga_10_gp;
+      break;
+    case 21:      cPal = saga_11_gp;
+      break;
+    case 22:      cPal = saga_12_gp;
+      break;
+    case 23:      cPal = saga_13_gp;
+      break;
+    case 24:      cPal = saga_14_gp;
+      break;
+    case 25:      cPal = saga_15_gp;
+      break;
+    case 26:      cPal = saga_17_gp;
+      break;
+    
+    }
+}
+*/
+/*
+ * // Determine flash address of text string
+unsigned int currentStringAddress = 0;
+void selectFlashString(byte string) {
+  currentStringAddress = pgm_read_word(&stringArray[string]);
+}
+
+// Fetch font character bitmap from flash
+byte charBuffer[5] = {0};
+void loadCharBuffer(byte character) {
+  byte mappedCharacter = character;
+  if (mappedCharacter >= 32 && mappedCharacter <= 95) {
+    mappedCharacter -= 32; // subtract font array offset
+  } else if (mappedCharacter >= 97 && mappedCharacter <= 122) {
+    mappedCharacter -= 64; // subtract font array offset and convert lowercase to uppercase
+  } else {
+    mappedCharacter = 96; // unknown character block
+  }
+  
+  for (byte i = 0; i < 5; i++) {
+    charBuffer[i] = pgm_read_byte(Font[mappedCharacter]+i);
+  }
+  
+}
+
+// Fetch a character value from a text string in flash
+char loadStringChar(byte string, byte character) {
+  return (char) pgm_read_byte(currentStringAddress + character);
+}
+ */
