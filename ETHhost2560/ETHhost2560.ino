@@ -52,8 +52,15 @@ void routeOSC() {
       bundleIN.route("/CLK", CLK);
       bundleIN.route("/p", onPulse);
       bundleIN.route("/v", VOL);
-      bundleIN.route("/lZ", CUSTOM);
+     
       bundleIN.route("/cFX", CUSTOM);
+      bundleIN.route("/cPFX", CUSTOM);
+      bundleIN.route("/cPal", CUSTOM);
+      bundleIN.route("/hS", CUSTOM); //hueSpeed
+      bundleIN.route("/rT", CUSTOM); //runTime
+      bundleIN.route("/fT", CUSTOM); //fadeTime
+
+       bundleIN.route("/lZ", CUSTOM);
       bundleIN.route("/sM", CUSTOM);
      }
    }

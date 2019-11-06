@@ -1,10 +1,8 @@
 #include <FastLED.h>
 #include <Wire.h>
-/*
-   DO NOT FORGET TO UPDATE YOUR XY MAPPINGS!
-*/
 
 #define ADDR           2
+uint8_t brightness = 64;
 
 #include "XYmap.h"
 #include "global.h"
@@ -12,6 +10,7 @@
 #include "paints.h"
 #include "utils.h"
 #include "ledFX.h"
+#include "pulseFX.h"
 
 //autoMode Function List
 functionList fxList[] = {
@@ -29,24 +28,20 @@ functionList fxList[] = {
   colourFill, //11
   slantBars, //12
   simpleStrobe, //13
-  theLights, // fillNoise8, 14
-  theLights, // fire not working (15)
-  theLights ,  //palLoop, //16
-  theLights,//  BouncingBalls, //17
-  theLights, // for txt1 18
-  theLights, // for txt2 19
-  theLights // for txt3 //20
 };
 const byte numFX = (sizeof(fxList) / sizeof(fxList[0]));
 
 // Pulse Mode Function List
 functionList pulseFX[] = {
-  flash,
+  flash,//0
   flashArray,
   mFlash,
   zoneFlash,
   riderS,
-  confet
+  confet,//5
+  fader,
+  iterator,
+  fun
 };
 
 void setup() {
@@ -84,7 +79,7 @@ void loop() {
   }
   if (cMil - hMil > hTime) {
     hMil = cMil;
-    hCycle(1); // increment the global hue value
+    hCycle(1+hueSpeed); // increment the global hue value
   }
   if (Mode == 0) { // when autoPilot ...
     // run the currently selected effect every effectDelay milliseconds
@@ -94,18 +89,18 @@ void loop() {
     }
   }
   if (Mode == 1) { // when pulse on..
-    pulseFX[1](); // cpFX
+    pulseFX[cpFX](); // cpFX
   }
   // run a fade effects too..
   if (Mode == 0) {
-    if (fxList[cFX] == confetti) fadeAll(1);
+    if (fxList[cFX] == confetti) fadeAll(1+fadeTime);
     //if(fxList[cFX] == theLights) fadeAll(2);
     //if(fxList[cFX] == sinelon) fadeAll(2);
-    if (fxList[cFX] == bpm) fadeAll(1);
-    if (fxList[cFX] == bouncingTrails) fadeAll(1);
+    if (fxList[cFX] == bpm) fadeAll(1+fadeTime);
+    if (fxList[cFX] == bouncingTrails) fadeAll(1+fadeTime);
   }
   if (Mode == 1) {
-    fadeAll(1); // fade out the leds after pulse
+    fadeAll(1+fadeTime); // fade out the leds after pulse
   }
   FastLED.show(); // send the contents of the led memory to the LEDs
 }
@@ -148,6 +143,11 @@ void parseIIC() {
     case 15:      pFlag[5] = 1;      break;
     case 16:      pFlag[6] = 1;      break;
     case 17:      pFlag[7] = 1;      break;
+
+    case 20:      { hueSpeed = v; DPRINT("hue = "); DPRINTLN(v); }     break;
+    case 21:      { runTime = v; DPRINT("autoRunTime = "); DPRINTLN(v); }     break;
+    case 23:      { fadeTime = v; DPRINT("fadeTime = "); DPRINTLN(v); }     break;
+    
   }
   //DPRINT("t = ");DPRINTLN(t);DPRINT("v = ");DPRINTLN(v);
 }

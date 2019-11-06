@@ -1,3 +1,10 @@
+void runCheck(int val){
+  if (fxInit == false) {
+    fxInit = true;
+    fxDelay = val+runTime;
+  }
+}
+
 void get_bits(int type, int val){
   for(int j=0;j<4;j++){
     byte i = bitRead(val,j);
@@ -44,12 +51,12 @@ void setPixel(int Pixel, byte red, byte green, byte blue){
 // Fade every LED in the array by a specified amount
 void fadeAll(byte fadeIncr) {
   for (byte i = 0; i < NUM_LEDS; i++) {
-    leds[i] = leds[i].fadeToBlackBy(fadeIncr);
+    leds[i] = leds[i].fadeToBlackBy(fadeIncr+fadeTime);
   }
 }
 void fadeCustom(byte fadeIncr) {
   for (byte i = 0; i < NUM_LEDS; i++) {
-    leds[i] = leds[i].fadeToBlackBy(fadeIncr);
+    leds[i] = leds[i].fadeToBlackBy(fadeIncr+fadeTime);
   }
 }
 
