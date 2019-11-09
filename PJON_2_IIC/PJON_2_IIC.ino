@@ -1,4 +1,5 @@
-#include <Wire.h>
+#define I2C_NUM 2 // no of IIC channels on branch.
+
 #include "global.h"
 #include "macros.h"
 #include "utils.h"
@@ -6,7 +7,6 @@
 
 void setup() {
   DBEGIN(9600);
-    bus.set_error(error_handler); // link PJON to error handler
     bus.set_receiver(receiver_handler); // link PJON to receiver
     bus.strategy.set_pin(12); // Set PJON pin
     bus.begin(); // 
