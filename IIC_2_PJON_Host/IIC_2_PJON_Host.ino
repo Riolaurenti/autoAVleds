@@ -13,30 +13,46 @@
  * ToDo - Ignore Master
  */
 
-void receiveEvent(int howMany) {
-  while (Wire.available()) { // loop through all but the last
-    char c = Wire.read(); // receive byte as a characte   // print the character
-    i2cStr.concat(c);
+void parseIIC(){
+  int comma = received.indexOf(',');
+  String typeN = received.substring(0,comma);
+  int t = typeN.toInt();
+  switch(t) {
+    case 10: bus.send_packet(PJON_BROADCAST, "10" , 3);break;
+    case 11: bus.send_packet(PJON_BROADCAST, "11" , 3);break;
+    case 12: bus.send_packet(PJON_BROADCAST, "12" , 3);break;
+    case 13: bus.send_packet(PJON_BROADCAST, "13" , 3);break;
+    case 14: bus.send_packet(PJON_BROADCAST, "14" , 3);break;
+    case 15: bus.send_packet(PJON_BROADCAST, "15" , 3);break;
+    case 16: bus.send_packet(PJON_BROADCAST, "16" , 3);break;
+    case 17: bus.send_packet(PJON_BROADCAST, "17" , 3);break;
+    case 18: bus.send_packet(PJON_BROADCAST, "18" , 3);break;
+    default:  sendPjon(received); break;
   }
-  DPRINTLN();
-  DPRINT("ASSEMBLED MESSAGE FROM I2C : ");
-  DPRINTLN(i2cStr);
-  sendPjon(i2cStr);
-  i2cStr = "";
 }
 
+void eHandler(int howMany) {
+  while (Wire.available()) {    
+     char c = Wire.read();             // receive a byte as character
+     received.concat(c);          //Add the character to the received string
+     } 
+  DPRINTLN(received);
+  parseIIC();
+  received = "";
+}
 void sendPjon(String str){ 
-  DPRINT("SENDING TO MASTER");
   const char pkt[str.length()+1]; // Create array
   str.toCharArray(pkt,str.length()+1); // Convert string to Char[]
   bus.send(PJON_BROADCAST,pkt,str.length()+1); // Send the packet to everyone 
-  DPRINTLN(pkt);
+  //flag1 = LOW;
+  //DPRINTLN(pkt);
 };
 
 void setup() {
-  DBEGIN(115200);
-  Wire.begin(8);              // join i2c bus with address #8
-  Wire.onReceive(receiveEvent);
+  DBEGIN(9600);
+  DPRINTLN("Setup"); 
+  Wire.begin(2);              // join i2c bus with address #8
+  Wire.onReceive(eHandler);
   bus.set_error(error_handler); // link PJON to error handler
   bus.set_receiver(receiver_handler); // link PJON to receiver
   bus.strategy.set_pin(12); // Set PJON pin

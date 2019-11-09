@@ -1,4 +1,29 @@
+void runCheck(int val){
+  if (fxInit == false) {
+    fxInit = true;
+    fxDelay = val+runTime;
+  }
+}
 
+void get_bits(int type, int val){
+  for(int j=0;j<4;j++){
+    byte i = bitRead(val,j);
+    if(type==8 && j==ourAddr){      Zone = i;      }
+    if(type==9 ){      subZone[j] = i;    }
+    if(type==20){      zVals[j]=i;      }
+    //DPRINT(i);  
+    DPRINT(subZone[i]);
+  }  
+  DPRINTLN();
+}
+
+
+/*
+ * When stripNumber changes... / patternNumber 
+ * patternStore[stripNumber]=patternNumber;
+ */
+
+ 
 // Increment the global hue value for functions that use it
 byte cycHue = 0;
 byte cycHueCount = 0;
@@ -26,12 +51,12 @@ void setPixel(int Pixel, byte red, byte green, byte blue){
 // Fade every LED in the array by a specified amount
 void fadeAll(byte fadeIncr) {
   for (byte i = 0; i < NUM_LEDS; i++) {
-    leds[i] = leds[i].fadeToBlackBy(fadeIncr);
+    leds[i] = leds[i].fadeToBlackBy(fadeIncr+fadeTime);
   }
 }
 void fadeCustom(byte fadeIncr) {
   for (byte i = 0; i < NUM_LEDS; i++) {
-    leds[i] = leds[i].fadeToBlackBy(fadeIncr);
+    leds[i] = leds[i].fadeToBlackBy(fadeIncr+fadeTime);
   }
 }
 
@@ -80,8 +105,8 @@ void selPal() {
     case 25:      cPal = saga_15_gp;      break;
     case 26:      cPal = saga_17_gp;      break;    
     }
-    DPRINT("pallete = ");
-    DPRINTLN(cPalVal);
+   // DPRINT("pallete = ");
+   // DPRINTLN(cPalVal);
 }
 /*
 // Pick a random palette from a list

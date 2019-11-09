@@ -1,115 +1,8 @@
-void runCheck(int val){
-  if (fxInit == false) {
-    fxInit = true;
-    FXdel = val;
-    fxDelay = val;
-  }
-}
-/*
- * OnPulse Scripts
- */
-
- /*
-  * Simple Momentary Tricks
-  */
-void flash(){ // Single Channel Pulse Example with hard colour choice
-  runCheck(30);
-  if (pFlag[0]==1){
-   for (int x = 0; x < kMatrixWidth; x++) {
-    for (int y = 0; y < kMatrixHeight; y++) {
-      leds[XY(x,y)] = CRGB::White;
-      } 
-    }
-  }
-  pFlag[0]=0;
-}
-void mFlash(){ // Multi Channel Pulse Example with hard colour choice
-  runCheck(30);
-  for( int i = 0 ; i < kMatrixHeight;i++){
-     if (pFlag[i]==1){
-        for (int x = 0; x < kMatrixWidth; x++) {
-          for (int y = 0; y < kMatrixHeight; y++) {
-            leds[XY(x+(i*kMatrixWidth),i)] = CRGB::White;
-           } 
-        }
-      }
-   pFlag[i]=0;
-   }
-}
-
-void cFlash(CRGB COL){ // Single Channel Pulse Example with hard colour choice
-  runCheck(30);
-  if (pFlag[0]==1){
-   for (int x = 0; x < kMatrixWidth; x++) {
-    for (int y = 0; y < kMatrixHeight; y++) {
-      leds[XY(x,y)] = COL;
-      } 
-    }
-  }
-  pFlag[0]=0;
-}
-
-void flashArray(){ // Multi-Channel Pulse Example single Strip.
-  runCheck(30);
-  int numChan = sizeof(pFlag) ; // add controller here
-  for (int i = 0; i < numChan; i++){
-     if (pFlag[i]==1){
-       for (int x = 0; x < kMatrixWidth/numChan; x++) {
-         for (int y = 0; y < kMatrixHeight; y++) {
-            leds[XY(x+(i*(kMatrixWidth/numChan)),y)] = CRGB::White;
-          } 
-        }
-      }      
-   pFlag[i]=0;
-  }
-  if(cFlag==1){ // Clock is added single blue LED
-        if(cur_Step<=NUM_LEDS-1){
-            leds[cur_Step] = CRGB::Blue;
-        }
-    }
-   cFlag=0;   
-}
-
-void confet(){
-  runCheck(30);
-  if (pFlag[0]==1){
-   for (int x = 0; x < kMatrixWidth; x++) {
-    for (int y = 0; y < kMatrixHeight; y++) {
-      leds[XY(random16(kMatrixWidth), random16(kMatrixHeight))] = ColorFromPalette(cPal, random16(255), 255); //CHSV(random16(255), 255, 255);
-      } 
-    }
-  }
-  pFlag[0]=0;
-}
-void iterator() { // realy bad example of on frame actions
-  runCheck(30);
-  if(itX>=kMatrixWidth) itX=0;
-  if(pFlag[0]==1){
-    leds[itX] = CRGB::White;
-    if(itX==0)leds[kMatrixWidth] = CRGB::Black;
-    else leds[itX-1] = CRGB::Black;
-    }
-  pFlag[0]=0;
-  itX++;
-}
-
-
-
-/*
- * OnScene Scripts
- */
-/*
- * Old Patterns from DV2
- */
 void theLights() {
   runCheck(10);
   fadeToBlackBy(&(leds[0]), NUM_LEDS, 10);
   int pos = random16(0, NUM_LEDS);
-  colorIndex = (colorIndex + 10);
-  if (colorIndex > 254) {
-    colorIndex = 0;
-  }
-  leds[pos] = ColorFromPalette( cPal, colorIndex, brightness, currentBlending);
+  leds[pos] = ColorFromPalette( cPal, cycHue, brightness, currentBlending);
 }
 
 void rainbow() {
@@ -129,28 +22,147 @@ void sinelon() {
    runCheck(10);
   fadeToBlackBy(&(leds[0]), NUM_LEDS, 20);
   int pos = beatsin16( 13, 0, NUM_LEDS - 1 ) ;
-  colorIndex++;
-  if (colorIndex > 254) { // maybe further reduce by making colorIndex cycHue? Or a global timer
-    colorIndex = 0;
-  }
-  leds[pos] = ColorFromPalette( cPal, colorIndex, brightness, currentBlending);
+  leds[pos] = ColorFromPalette( cPal, cycHue, brightness, currentBlending);
 }
 
 void bpm() {
   runCheck(10);
   uint8_t beat = beatsin8( 62, 64, 255);
   for (int i = 0; i < NUM_LEDS; i++) { 
-    EVERY_N_MILLISECONDS(20){
-     colorIndex++; //not necessary...
-     if (colorIndex > 254) {//not necessary...
-      colorIndex = 0;//not necessary...
-     }
-    }
-    leds[i] = ColorFromPalette(cPal, colorIndex + (i * 2), beat - 0 + (i * 10));
+    leds[i] = ColorFromPalette(cPal, cycHue + (i * 2), beat - 0 + (i * 10));
     }
 }
 
+void threeSine() {
+  static byte sineOffset = 0; // counter for current position of sine waves
+  runCheck(20);
+  for (byte x = 0; x < kMatrixWidth; x++) {
+    for (int y = 0; y < kMatrixHeight; y++) {
+      byte sinDistanceR = qmul8(abs(y * (255 / kMatrixHeight) - sin8(sineOffset * 9 + x * 16)), 2);
+      byte sinDistanceG = qmul8(abs(y * (255 / kMatrixHeight) - sin8(sineOffset * 10 + x * 16)), 2);
+      byte sinDistanceB = qmul8(abs(y * (255 / kMatrixHeight) - sin8(sineOffset * 11 + x * 16)), 2);
+      leds[XY(x, y)] = CRGB(255 - sinDistanceR, 255 - sinDistanceG, 255 - sinDistanceB);
+    }
+  }
+  sineOffset++; // byte will wrap from 255 to 0, matching sin8 0-255 cycle
+}
 
+void plasma() {
+  static byte offset  = 0; // counter for radial color wave motion
+  static int plasVector = 0; // counter for orbiting plasma center
+  runCheck(10);
+  int xOffset = cos8(plasVector / 256);
+  int yOffset = sin8(plasVector / 256);
+  for (int x = 0; x < kMatrixWidth; x++) {
+    for (int y = 0; y < kMatrixHeight; y++) {
+      byte color = sin8(sqrt(sq(((float)x - 7.5) * 10 + xOffset - 127) + sq(((float)y - 2) * 10 + yOffset - 127)) + offset);
+      leds[XY(x, y)] = CHSV(color, 255, 255);
+    }
+  }
+  offset++; // wraps at 255 for sin8
+  plasVector += 16; // using an int for slower orbit (wraps at 65536)
+}
+
+void rider() {
+  static byte riderPos = 0;
+  if (fxInit == false) {
+    fxInit = true;
+    fxDelay = 5;
+    riderPos = 0;
+  }
+  for (byte x = 0; x < kMatrixWidth; x++) {
+    int brightness = abs(x * (256 / kMatrixWidth) - triwave8(riderPos) * 2 + 127) * 3;
+    if (brightness > 255) brightness = 255;
+    brightness = 255 - brightness;
+    CRGB riderColor = CHSV(cycHue, 255, brightness);
+    for (byte y = 0; y < kMatrixHeight; y++) {
+      leds[XY(x, y)] = riderColor;
+    }
+  }
+  riderPos++; // byte wraps to 0 at 255, triwave8 is also 0-255 periodic
+}
+
+
+void slantBars() {
+  static byte slantPos = 0;
+  runCheck(5);
+  for (byte x = 0; x < kMatrixWidth; x++) {
+    for (byte y = 0; y < kMatrixHeight; y++) {
+      leds[XY(x, y)] = CHSV(cycHue, 255, quadwave8(x * 32 + y + slantPos));
+    }
+  }
+  slantPos -= 4;
+}
+
+void glitter() {
+  runCheck(30);
+  for (int x = 0; x < kMatrixWidth; x++) {
+    for (int y = 0; y < kMatrixHeight; y++) {
+      leds[XY(x, y)] = CHSV(cycHue, 255, random8(5) * 63);
+    }
+  }
+}
+
+#define rainDir 0
+void sideRain() {
+  runCheck(15);
+  scrollArray(rainDir);
+  byte randPixel = random8(kMatrixHeight);
+  for (byte y = 0; y < kMatrixHeight; y++) leds[XY((kMatrixWidth - 1) * rainDir, y)] = CRGB::Black;
+   leds[XY((kMatrixWidth - 1)*rainDir, randPixel)] = CHSV(cycHue, 255, 255);  
+}
+
+void confetti() {
+  runCheck(30);
+  //selectRandomPalette();
+  // scatter random colored pixels at several random coordinates
+  for (byte i = 0; i < 4; i++) {
+    leds[XY(random16(kMatrixWidth), random16(kMatrixHeight))] = ColorFromPalette(cPal, random16(255), 255); //CHSV(random16(255), 255, 255);
+    }
+}
+
+void colourFill() {
+   fadeToBlackBy(&(leds[0]), NUM_LEDS, 20); // keep or not?
+  static byte currentColor = 0;
+  static byte currentRow = 0;
+  static byte currentDirection = 0;
+  if (fxInit == false) {
+    fxInit = true;
+    fxDelay = 45;
+    currentColor = 0;
+    currentRow = 0;
+    currentDirection = 0;
+    cPal = RainbowColors_p;
+  }
+  // test a bitmask to fill up or down when currentDirection is 0 or 2 (0b00 or 0b10)
+  if (!(currentDirection & 1)) {
+    fxDelay = 45; // slower since vertical has fewer pixels
+    for (byte x = 0; x < kMatrixWidth; x++) {
+      byte y = currentRow;
+      if (currentDirection == 2) y = kMatrixHeight - 1 - currentRow;
+      leds[XY(x, y)] = cPal[currentColor];
+    }
+  }
+  // test a bitmask to fill left or right when currentDirection is 1 or 3 (0b01 or 0b11)
+  if (currentDirection & 1) {
+    fxDelay = 20; // faster since horizontal has more pixels
+    for (byte y = 0; y < kMatrixHeight; y++) {
+      byte x = currentRow;
+      if (currentDirection == 3) x = kMatrixWidth - 1 - currentRow;
+      leds[XY(x, y)] = cPal[currentColor];
+    }
+  }
+  currentRow++;
+  // detect when a fill is complete, change color and direction
+  if ((!(currentDirection & 1) && currentRow >= kMatrixHeight) || ((currentDirection & 1) && currentRow >= kMatrixWidth)) {
+    currentRow = 0;
+    currentColor += random8(3, 6);
+    if (currentColor > 15) currentColor -= 16;
+    currentDirection++;
+    if (currentDirection > 3) currentDirection = 0;
+    fxDelay = 300; // wait a little bit longer after completing a fill
+  }
+}
 void bouncingTrails(){ // this is some messy code - will come back to it...
    runCheck(10);
   //sets a "spawn" in the middle half of a strip then sends a trail in either direction which bounces of the ends of the strip.
@@ -217,27 +229,6 @@ void bouncingTrails(){ // this is some messy code - will come back to it...
   }
   lastCount=counter;
 }
-/* NOT WORK!
-void palLoop() {
-  runCheck(30);
-  for(int j=0;j<3;j++){
-      for(int k=0;k<256;k++){
-        switch(j){
-          case 0: setAll(k,0,0); break;
-          case 1: setAll(0,k,0); break;
-          case 2: setAll(0,0,k); break;
-        }
-      }
-    for(int k=255;k>=0;k--){
-        switch(j){
-          case 0: setAll(k,0,0); break;
-          case 1: setAll(0,k,0); break;
-          case 2: setAll(0,0,k); break;
-        }
-      }
-  }
-}
-*/ 
 
 ///also not working!
 void BouncingBalls(byte red, byte green, byte blue, int BallCount) {
@@ -289,225 +280,6 @@ void BouncingBalls(byte red, byte green, byte blue, int BallCount) {
 /*
  * Frame By Frame +  Other Animations
  */
-void threeSine() {
-  static byte sineOffset = 0; // counter for current position of sine waves
-  runCheck(20);
-  for (byte x = 0; x < kMatrixWidth; x++) {
-    for (int y = 0; y < kMatrixHeight; y++) {
-      byte sinDistanceR = qmul8(abs(y * (255 / kMatrixHeight) - sin8(sineOffset * 9 + x * 16)), 2);
-      byte sinDistanceG = qmul8(abs(y * (255 / kMatrixHeight) - sin8(sineOffset * 10 + x * 16)), 2);
-      byte sinDistanceB = qmul8(abs(y * (255 / kMatrixHeight) - sin8(sineOffset * 11 + x * 16)), 2);
-      leds[XY(x, y)] = CRGB(255 - sinDistanceR, 255 - sinDistanceG, 255 - sinDistanceB);
-    }
-  }
-  sineOffset++; // byte will wrap from 255 to 0, matching sin8 0-255 cycle
-}
-
-void plasma() {
-  static byte offset  = 0; // counter for radial color wave motion
-  static int plasVector = 0; // counter for orbiting plasma center
-  runCheck(10);
-  int xOffset = cos8(plasVector / 256);
-  int yOffset = sin8(plasVector / 256);
-  for (int x = 0; x < kMatrixWidth; x++) {
-    for (int y = 0; y < kMatrixHeight; y++) {
-      byte color = sin8(sqrt(sq(((float)x - 7.5) * 10 + xOffset - 127) + sq(((float)y - 2) * 10 + yOffset - 127)) + offset);
-      leds[XY(x, y)] = CHSV(color, 255, 255);
-    }
-  }
-  offset++; // wraps at 255 for sin8
-  plasVector += 16; // using an int for slower orbit (wraps at 65536)
-}
-
-void rider() {
-  static byte riderPos = 0;
-  if (fxInit == false) {
-    fxInit = true;
-    fxDelay = 5;
-    riderPos = 0;
-  }
-  for (byte x = 0; x < kMatrixWidth; x++) {
-    int brightness = abs(x * (256 / kMatrixWidth) - triwave8(riderPos) * 2 + 127) * 3;
-    if (brightness > 255) brightness = 255;
-    brightness = 255 - brightness;
-    CRGB riderColor = CHSV(cycHue, 255, brightness);
-    for (byte y = 0; y < kMatrixHeight; y++) {
-      leds[XY(x, y)] = riderColor;
-    }
-  }
-  riderPos++; // byte wraps to 0 at 255, triwave8 is also 0-255 periodic
-}
-
-void colourFill() {
-   fadeToBlackBy(&(leds[0]), NUM_LEDS, 20); // keep or not?
-  static byte currentColor = 0;
-  static byte currentRow = 0;
-  static byte currentDirection = 0;
-  if (fxInit == false) {
-    fxInit = true;
-    fxDelay = 45;
-    currentColor = 0;
-    currentRow = 0;
-    currentDirection = 0;
-    cPal = RainbowColors_p;
-  }
-  // test a bitmask to fill up or down when currentDirection is 0 or 2 (0b00 or 0b10)
-  if (!(currentDirection & 1)) {
-    fxDelay = 45; // slower since vertical has fewer pixels
-    for (byte x = 0; x < kMatrixWidth; x++) {
-      byte y = currentRow;
-      if (currentDirection == 2) y = kMatrixHeight - 1 - currentRow;
-      leds[XY(x, y)] = cPal[currentColor];
-    }
-  }
-  // test a bitmask to fill left or right when currentDirection is 1 or 3 (0b01 or 0b11)
-  if (currentDirection & 1) {
-    fxDelay = 20; // faster since horizontal has more pixels
-    for (byte y = 0; y < kMatrixHeight; y++) {
-      byte x = currentRow;
-      if (currentDirection == 3) x = kMatrixWidth - 1 - currentRow;
-      leds[XY(x, y)] = cPal[currentColor];
-    }
-  }
-  currentRow++;
-  // detect when a fill is complete, change color and direction
-  if ((!(currentDirection & 1) && currentRow >= kMatrixHeight) || ((currentDirection & 1) && currentRow >= kMatrixWidth)) {
-    currentRow = 0;
-    currentColor += random8(3, 6);
-    if (currentColor > 15) currentColor -= 16;
-    currentDirection++;
-    if (currentDirection > 3) currentDirection = 0;
-    fxDelay = 300; // wait a little bit longer after completing a fill
-  }
-}
-
-void slantBars() {
-  static byte slantPos = 0;
-  runCheck(5);
-  for (byte x = 0; x < kMatrixWidth; x++) {
-    for (byte y = 0; y < kMatrixHeight; y++) {
-      leds[XY(x, y)] = CHSV(cycHue, 255, quadwave8(x * 32 + y + slantPos));
-    }
-  }
-  slantPos -= 4;
-}
-
-void glitter() {
-  runCheck(30);
-  for (int x = 0; x < kMatrixWidth; x++) {
-    for (int y = 0; y < kMatrixHeight; y++) {
-      leds[XY(x, y)] = CHSV(cycHue, 255, random8(5) * 63);
-    }
-  }
-}
-
-#define rainDir 0
-void sideRain() {
-  runCheck(15);
-  scrollArray(rainDir);
-  byte randPixel = random8(kMatrixHeight);
-  for (byte y = 0; y < kMatrixHeight; y++) leds[XY((kMatrixWidth - 1) * rainDir, y)] = CRGB::Black;
-   leds[XY((kMatrixWidth - 1)*rainDir, randPixel)] = CHSV(cycHue, 255, 255);  
-}
-
-void confetti() {
-  runCheck(30);
-  //selectRandomPalette();
-  // scatter random colored pixels at several random coordinates
-  for (byte i = 0; i < 4; i++) {
-    leds[XY(random16(kMatrixWidth), random16(kMatrixHeight))] = ColorFromPalette(cPal, random16(255), 255); //CHSV(random16(255), 255, 255);
-    }
-}
-
-/*
- * Noise Code
- */
-
- /*
-void mapNoiseToLEDsUsingPalette()
-{
-  static uint8_t ihue=0;
-  for(int i = 0; i < kMatrixWidth; i++) {
-    for(int j = 0; j < kMatrixHeight; j++) {
-      // We use the value at the (i,j) coordinate in the noise
-      // array for our brightness, and the flipped value from (j,i)
-      // for our pixel's index into the color palette.
-      uint8_t index = noise[j][i];
-      uint8_t bri =   noise[i][j];
-      // if this palette is a 'loop', add a slowly-changing base value
-      if( colorLoop) { 
-        index += ihue;
-      }
-      // brighten up, as the color palette itself often contains the 
-      // light/dark dynamic range desired
-      if( bri > 127 ) {
-        bri = 255;
-      } else {
-        bri = dim8_raw( bri * 2);
-      }
-      CRGB color = ColorFromPalette( cPal, index, bri);
-      leds[XY(i,j)] = color;
-    }
-  }
-  ihue+=1;
-}
-void fillNoise8() {
-  uint8_t dataSmoothing = 0;
-  if( speed < 50) {
-    dataSmoothing = 200 - (speed * 4);
-  }  
-  for(int i = 0; i < MAX_DIMENSION; i++) {
-    int ioffset = scale * i;
-    for(int j = 0; j < MAX_DIMENSION; j++) {
-      int joffset = scale * j;
-   
-      uint8_t data = inoise8(xX + ioffset,yY + joffset,zZ);
-      // The range of the inoise8 function is roughly 16-238.
-      // These two operations expand those values out to roughly 0..255
-      // You can comment them out if you want the raw noise data.
-      data = qsub8(data,16);
-      data = qadd8(data,scale8(data,39));
-
-      if( dataSmoothing ) {
-        uint8_t olddata = noise[i][j];
-        uint8_t newdata = scale8( olddata, dataSmoothing) + scale8( data, 256 - dataSmoothing);
-        data = newdata;
-      }
-      noise[i][j] = data;
-    }
-  }
-  zZ += speed;
-  // apply slow drift to X and Y, just for visual variation.
-  xX += speed / 8;
-  yY -= speed / 16;
-  mapNoiseToLEDsUsingPalette();
-}
-*/
-void fire()
-{
-  static byte heat[NUM_LEDS];
-    for( int i = 0; i < NUM_LEDS; i++) {
-      heat[i] = qsub8( heat[i],  random(0, ((COOLING * 10) / NUM_LEDS) + 2));
-    }
-    for( int k= NUM_LEDS - 1; k >= 2; k--) {
-      heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
-    }
-    if( random() < SPARKING ) {
-      int y = random(7);
-      heat[y] = qadd8( heat[y], random(160,255) );
-    }
-    for( int j = 0; j < NUM_LEDS; j++) {
-      byte colorindex = scale8( heat[j], 240);
-      CRGB color = ColorFromPalette( cPal, colorindex);
-      int pixelnumber;
-      if( gReverseDirection ) {
-        pixelnumber = (NUM_LEDS-1) - j;
-      } else {
-        pixelnumber = j;
-      }
-      leds[pixelnumber] = color;
-    }
-}
 
 /*
  * Strobe Code!
@@ -520,7 +292,7 @@ static void strobeDraw( uint8_t startpos, uint16_t lastpos, uint8_t period, uint
     //CRGB color = CRGB::Blue; // USE TO COMPLETELY BYPASS HSV Change Scheme
     uint16_t pos = i;
     for ( uint8_t w = 0; w < width; w++) {
-      leds[pos] = ColorFromPalette( cPal, colorIndex, brightness, currentBlending);
+      leds[pos] = ColorFromPalette( cPal, cycHue, brightness, currentBlending);
       pos++;
       if ( pos >= NUM_LEDS) {
         break;
