@@ -1,3 +1,20 @@
+void runCheck(int val){
+  if (fxInit == false) {
+    fxInit = true;
+    fxDelay = val;
+  }
+}
+void get_bits(int type, int val){
+  for(int j=0;j<4;j++){
+    byte i = bitRead(val,j);
+    if(type==8 && j==ourAddr){      Zone = i;      }
+    if(type==9 ){      subZone[j] = i;    }
+    if(type==20){      zVals[j]=i;      }
+    //DPRINT(i);  
+    DPRINT(subZone[i]);
+  }  
+  DPRINTLN();
+}
 
 // Increment the global hue value for functions that use it
 byte cycHue = 0;

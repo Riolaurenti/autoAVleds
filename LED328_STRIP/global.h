@@ -11,7 +11,6 @@
 #define STARTBRIGHT 60
 #define cTime 15000
 #define hTime 30
-
 #define STROBE_BEATS_PER_MINUTE 97.5
 #define COOLING  55 // fire (20-100)
 #define SPARKING 120 //(50-200)
@@ -40,10 +39,11 @@ volatile int cPalVal = 0; // current Paltte Value
 byte cBright = STARTBRIGHT; // 0-255 will be scaled to 0-MAXBRIGHTNESS
 
 volatile int runTime = 0; // Global holder for Runtime value multiplier (0-60)
-volatile int runTimeP = 0; // Global holder for Pulse Runtime value multiplier (0-60)
 volatile int fadeTime = 0; // Global holder for Fade increment value ( 0 - 100+)
-volatile int fadeTimeP = 0;
 volatile int hueSpeed = 0; // hueSpeed multiplier (0-10 maybe more)
+uint8_t gHue = 0;
+int myDelay = 30;
+TBlendType currentBlending;
 
 String received; 
 boolean fxInit = false; // indicates if a pattern has been recently switched
@@ -52,14 +52,8 @@ unsigned long fxMil = 0; // store the time of last effect function run
 unsigned long cycMil = 0; // store the time of last effect change
 unsigned long cMil; // store current loop's millis value
 unsigned long hMil; // store time of last hue change
+int itXmem[] = {0,0,0,0};
 
-uint8_t gHue = 0;
-int myDelay = 30;
-int colorIndex = 0;
-TBlendType currentBlending;
 
 typedef void (*functionList)(); // definition for list of effect function pointers
 extern const byte numFX;
-
-int itX = 0; // used for iterator, debug only
-int itXmem[] = {0,0,0,0};

@@ -1,13 +1,9 @@
 #include <FastLED.h>
 #include <Wire.h>
-/*
- * DO NOT FORGET TO UPDATE YOUR XY MAPPINGS!
- * 
- * Current Setup is for 6 8x8 Matrices, 3 in each row (see XY)
- */
+//#include <LEDMatrix.h>
 
-#define LED_PIN        5
-#define LED_PIN2       7
+#define ADDR           2
+uint8_t brightness = 64;
 
 #include "XYmap.h"
 #include "global.h"
@@ -17,6 +13,9 @@
 #include "paints.h"
 #include "utils.h"
 #include "ledFX.h"
+#include "shapes.h"
+#include "pulseFX.h"
+#include "matFX.h"
 
 //autoMode Function List
 functionList fxList[] = {
@@ -36,7 +35,6 @@ functionList fxList[] = {
   simpleStrobe,
   fillNoise8,
   fire,
-  palLoop,
   BouncingBalls,
   txtA,
   txtB,
@@ -46,8 +44,15 @@ const byte numFX = (sizeof(fxList)/sizeof(fxList[0]));
 
 // Pulse Mode Function List
 functionList pulseFX[] = {
-  flash,
+  flash,//0
   flashArray,
+  mFlash,
+  zoneFlash,
+  riderS,
+  confet,//5
+  fader,
+  iterator,
+  fun
 };
 
 void setup() {
@@ -64,78 +69,55 @@ void setup() {
   zZ = random16();
 }
 
-void loop() { 
- cMil = millis(); 
-  
-  // Make analog updates here
-  // Consider adding Entropy
- 
-  if(Mode==0){ // if autoPilot is on...
-    // switch to a new effect every cycleTime milliseconds
+void loop() {
+  cMil = millis();
+  if (!Mode) { // if autoPilot is on...
     if (cMil - cycMil > cTime) {
       cycMil = cMil;
-      if(Solo==1)if (++cFX >= numFX) cFX = 0; // loop to start of effect list
+      //if (++cFX >= numFX) cFX = 0; //upgrade, add current runtime
       fxInit = false; // trigger effect initialization when new effect is selected *****
     }
   }
   if (cMil - hMil > hTime) {
     hMil = cMil;
-    hCycle(1); // increment the global hue value
+    hCycle(1+hueSpeed); // increment the global hue value
   }
-  if(Mode==0) { // when autoPilot ... 
-    // run the currently selected effect every effectDelay milliseconds
+  if (Mode) { // when pulse on..
+    pulseFX[cpFX](); // cpFX
+  }
+  else { // when autoPilot ...
     if (cMil - fxMil > fxDelay) {
       fxMil = cMil;
-      fxList[cFX](); // run the selected effect function
-      }
+      fxList[cFX]();
+    }
   }
-  if(Mode==1){ // when pulse on..
-      pulseFX[cpFX](); //
+  if (Mode) {
+    fadeAll(1+fadeTime); // fade out the leds after pulse
   }
-  // run a fade effects too.. 
-  if (Mode==0){
-    if(fxList[cFX] == confetti) fadeAll(1);
-    if(fxList[cFX] == theLights) fadeAll(5);
-    if(fxList[cFX] == sinelon) fadeAll(1);
-    if(fxList[cFX] == bpm) fadeAll(1);
-    if(fxList[cFX] == bouncingTrails) fadeAll(1);
-  }
-  if (Mode==1){
-    fadeAll(1); // fade out the leds after pulse
-  }
+  else {
+    if (fxList[cFX] == confetti) fadeAll(1+fadeTime);
+    //if(fxList[cFX] == theLights) fadeAll(2);
+    //if(fxList[cFX] == sinelon) fadeAll(2);
+    if (fxList[cFX] == bpm) fadeAll(1+fadeTime);
+    if (fxList[cFX] == bouncingTrails) fadeAll(1+fadeTime);
+  }  
   FastLED.show(); // send the contents of the led memory to the LEDs
 }
 
-
-void eHandler(int aa) {
-  int i =0;
-  while (Wire.available()) {
-    iicTable[i] = Wire.read();    // receive byte as an integer
-    i=i+1;
-    DPRINT(iicTable[i]);
-  }
-  DPRINTLN();
-  switch (iicTable[0]) {
-    case 1:       Mode = 0;      break;
-    case 2:      Mode = 1;      break;
-    case 3:    { // receive current step integer from clock
-      cFlag=1;
-      cur_Step=iicTable[1]; 
-      break;
-    }
-    case 4: {  // Is this Controller Primary or Secondary?
-      for(int i=0;i<sizeof(ioRule);i++){
-        ioRule[i]=iicTable[i+1];
-        iAm=ioRule[0]; //(use to change Mode if non auto is on - dont be fooled by current clk control)
-        Mode = iAm ; //Temporary placeholder, use if(auto mode = 0 and zone ctrl = 1)
-        DPRINT(ioRule[i]);
-      }
-      break;
-    }
-    case 5:       cPalVal = iicTable[1]; break; //get cPal
-    case 6:       cFX = iicTable[1]; break; //get cFX
-    case 7:       cpFX = iicTable[1]; break; //get cpFX (merge into message case #6)
-    
+void parseIIC() {
+  int comma = received.indexOf(',');
+  String typeN = received.substring(0, comma);
+  String valN = received.substring(comma + 1, 5);
+  int t = typeN.toInt();
+  int v = valN.toInt();
+  switch (t) {
+    case 1: {        cur_Step = v;      }    break;
+    case 2: {       if (v)Mode = 0; if (v == 2) Mode = 1;       }   break;
+    case 5: {        cPalVal = v;  selPal();      }   break;
+    case 6: {        cFX = v;      } break;
+    case 7: {        cpFX = v;      }    break;
+    case 8: {        byte Go = v; get_bits(8, Go);      } break;
+    case 9: {        byte Go = v; get_bits(9, Go);      } break;
     case 10:      pFlag[0] = 1;      break;
     case 11:      pFlag[1] = 1;      break;
     case 12:      pFlag[2] = 1;      break;
@@ -144,6 +126,19 @@ void eHandler(int aa) {
     case 15:      pFlag[5] = 1;      break;
     case 16:      pFlag[6] = 1;      break;
     case 17:      pFlag[7] = 1;      break;
-    
+    case 20:      { hueSpeed = v; DPRINT("hue = "); DPRINTLN(v); }     break;
+    case 21:      { runTime = v; DPRINT("autoRunTime = "); DPRINTLN(v); }     break;
+    case 23:      { fadeTime = v; DPRINT("fadeTime = "); DPRINTLN(v); }     break;    
   }
+  //DPRINT("t = ");DPRINTLN(t);DPRINT("v = ");DPRINTLN(v);
+}
+
+void eHandler(int aa) {
+  while (Wire.available()) {
+    char c = Wire.read();             // receive a byte as character
+    received.concat(c);          //Add the character to the received string
+  }
+  parseIIC();
+  //DPRINTLN(received);
+  received = "";
 }

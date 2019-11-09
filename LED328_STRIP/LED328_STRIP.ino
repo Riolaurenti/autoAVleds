@@ -66,14 +66,10 @@ void setup() {
 
 void loop() {
   cMil = millis();
-
-  //make analog updates here
-
-  if (Mode == 0) { // if autoPilot is on...
-    // switch to a new effect every cycleTime milliseconds
+  if (!Mode) { // if autoPilot is on...
     if (cMil - cycMil > cTime) {
       cycMil = cMil;
-      if (Solo == 1)if (++cFX >= numFX) cFX = 0; // loop to start of effect list
+      //if (++cFX >= numFX) cFX = 0; //upgrade, add current runtime
       fxInit = false; // trigger effect initialization when new effect is selected *****
     }
   }
@@ -81,27 +77,25 @@ void loop() {
     hMil = cMil;
     hCycle(1+hueSpeed); // increment the global hue value
   }
-  if (Mode == 0) { // when autoPilot ...
-    // run the currently selected effect every effectDelay milliseconds
+  if (Mode) { // when pulse on..
+    pulseFX[cpFX](); // cpFX
+  }
+  else { // when autoPilot ...
     if (cMil - fxMil > fxDelay) {
       fxMil = cMil;
       fxList[cFX]();
     }
   }
-  if (Mode == 1) { // when pulse on..
-    pulseFX[cpFX](); // cpFX
+  if (Mode) {
+    fadeAll(1+fadeTime); // fade out the leds after pulse
   }
-  // run a fade effects too..
-  if (Mode == 0) {
+  else {
     if (fxList[cFX] == confetti) fadeAll(1+fadeTime);
     //if(fxList[cFX] == theLights) fadeAll(2);
     //if(fxList[cFX] == sinelon) fadeAll(2);
     if (fxList[cFX] == bpm) fadeAll(1+fadeTime);
     if (fxList[cFX] == bouncingTrails) fadeAll(1+fadeTime);
-  }
-  if (Mode == 1) {
-    fadeAll(1+fadeTime); // fade out the leds after pulse
-  }
+  }  
   FastLED.show(); // send the contents of the led memory to the LEDs
 }
 
@@ -112,29 +106,13 @@ void parseIIC() {
   int t = typeN.toInt();
   int v = valN.toInt();
   switch (t) {
-    case 1: {
-        cur_Step = v;
-      }    break;
-    case 2: {
-        DPRINT("MODE");
-        if (v == 1) Mode = 0; // autoPilot
-        if (v == 2) Mode = 1; // Pulse Mode
-      }   break;
-
-    case 5: {
-        cPalVal = v;
-        selPal();
-      }   break;
-    case 6: {
-        cFX = v;
-      } break;
-    case 7: {
-        cpFX = v;
-      }    break;
-
+    case 1: {        cur_Step = v;      }    break;
+    case 2: {       if (v)Mode = 0; if (v == 2) Mode = 1;       }   break;
+    case 5: {        cPalVal = v;  selPal();      }   break;
+    case 6: {        cFX = v;      } break;
+    case 7: {        cpFX = v;      }    break;
     case 8: {        byte Go = v; get_bits(8, Go);      } break;
     case 9: {        byte Go = v; get_bits(9, Go);      } break;
-
     case 10:      pFlag[0] = 1;      break;
     case 11:      pFlag[1] = 1;      break;
     case 12:      pFlag[2] = 1;      break;
@@ -143,11 +121,9 @@ void parseIIC() {
     case 15:      pFlag[5] = 1;      break;
     case 16:      pFlag[6] = 1;      break;
     case 17:      pFlag[7] = 1;      break;
-
     case 20:      { hueSpeed = v; DPRINT("hue = "); DPRINTLN(v); }     break;
     case 21:      { runTime = v; DPRINT("autoRunTime = "); DPRINTLN(v); }     break;
-    case 23:      { fadeTime = v; DPRINT("fadeTime = "); DPRINTLN(v); }     break;
-    
+    case 23:      { fadeTime = v; DPRINT("fadeTime = "); DPRINTLN(v); }     break;    
   }
   //DPRINT("t = ");DPRINTLN(t);DPRINT("v = ");DPRINTLN(v);
 }

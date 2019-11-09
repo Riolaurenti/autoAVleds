@@ -333,10 +333,6 @@ void simpleStrobe () {
   const uint8_t kStrobeCycleLength = 4; // light every Nth frame
   static uint8_t sStrobePhase = 0;
   sStrobePhase = sStrobePhase + 1;
-  colorIndex++;
-  if (colorIndex > 256) {
-    colorIndex = 1;
-  }
   if ( sStrobePhase >= kStrobeCycleLength ) {
     sStrobePhase = 0;
   }
