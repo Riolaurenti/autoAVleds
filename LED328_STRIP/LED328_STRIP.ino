@@ -51,7 +51,7 @@ void setup() {
   Wire.onReceive(eHandler);
   if (cFX > (numFX - 1)) cFX = 0;
   if (kMatrixHeight == 1) {
-    FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, LAST_VISIBLE_LED + 1);
+    FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, NUM_LEDS);
     DPRINT("1 strip");
   }
   else if (kMatrixHeight == 4) {
