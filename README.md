@@ -8,3 +8,5 @@ See Bresenham line algorithm:
 https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 
 # autoAVleds
+
+https://en.wikipedia.org/wiki/Operators_in_C_and_C%2B%2B
