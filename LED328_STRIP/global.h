@@ -2,8 +2,8 @@
 #define LED_PIN2       3
 #define LED_PIN3       4
 #define LED_PIN4       5
-#define NUM_STRIPS     4 
-#define NUM_LEDS_PER_STRIP 42 
+//#define NUM_STRIPS     4 
+//#define NUM_LEDS_PER_STRIP 42 
 
 #define COLOR_ORDER    GRB
 #define CHIPSET        WS2812B

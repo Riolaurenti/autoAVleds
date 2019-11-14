@@ -1,4 +1,4 @@
-#define I2C_NUM 2 // no of IIC channels on branch.
+#define I2C_NUM 4 // no of IIC channels on branch.
 
 #include "global.h"
 #include "macros.h"

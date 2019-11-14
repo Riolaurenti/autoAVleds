@@ -1,7 +1,7 @@
 #include <FastLED.h>
 #include <Wire.h>
 
-#define ADDR           2
+#define ADDR           5
 uint8_t brightness = 64;
 
 #include "XYmap.h"
@@ -58,7 +58,7 @@ void setup() {
     FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, kMatrixWidth);
     FastLED.addLeds<CHIPSET, LED_PIN2, COLOR_ORDER> (leds, kMatrixWidth, kMatrixWidth);
     FastLED.addLeds<CHIPSET, LED_PIN3, COLOR_ORDER> (leds, 2 * kMatrixWidth, kMatrixWidth);
-    FastLED.addLeds<CHIPSET, LED_PIN4, COLOR_ORDER> (leds, 3 * kMatrixWidth , kMatrixWidth + 1);
+    FastLED.addLeds<CHIPSET, LED_PIN4, COLOR_ORDER> (leds, 3 * kMatrixWidth , kMatrixWidth);
     DPRINT("4 strips");
   }
   FastLED.setBrightness(scale8(cBright, MAXBRIGHT) );
