@@ -1,35 +1,46 @@
 #include <FastLED.h>
 #include <Wire.h>
 
-#define ADDR           5
+
+#define ADDR           2
 uint8_t brightness = 64;
 
 #include "XYmap.h"
 #include "global.h"
+#include "font.h"
+#include "messages.h"
 #include "macros.h"
 #include "paints.h"
 #include "utils.h"
 #include "ledFX.h"
+#include "shapes.h"
 #include "pulseFX.h"
+#include "matFX.h"
 
 //autoMode Function List
 functionList fxList[] = {
-  glitter, //0
-  sideRain, //1
-  confetti,//2
-  theLights,//3
-  rainbow, //4
-  sinelon, //5
-  bpm, //6
-  bouncingTrails, //7
-  threeSine, //8
-  plasma, //9
-  rider, //10
-  colourFill, //11
-  slantBars, //12
-  simpleStrobe, //13
+  glitter,
+  sideRain,
+  confetti,
+  theLights,
+  rainbow,
+  sinelon,
+  bpm,
+  bouncingTrails,
+  threeSine,
+  plasma,
+  rider,
+  colourFill,
+  slantBars,
+  simpleStrobe,
+  fillNoise8,
+  fire,
+  BouncingBalls,
+  txtA,
+  txtB,
+  txtC
 };
-const byte numFX = (sizeof(fxList) / sizeof(fxList[0]));
+const byte numFX = (sizeof(fxList)/sizeof(fxList[0]));
 
 // Pulse Mode Function List
 functionList pulseFX[] = {
@@ -50,18 +61,12 @@ void setup() {
   Wire.begin(ADDR);
   Wire.onReceive(eHandler);
   if (cFX > (numFX - 1)) cFX = 0;
-  if (kMatrixHeight == 1) {
-    FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, NUM_LEDS);
-    DPRINT("1 strip");
-  }
-  else if (kMatrixHeight == 4) {
-    FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, kMatrixWidth);
-    FastLED.addLeds<CHIPSET, LED_PIN2, COLOR_ORDER> (leds, kMatrixWidth, kMatrixWidth);
-    FastLED.addLeds<CHIPSET, LED_PIN3, COLOR_ORDER> (leds, 2 * kMatrixWidth, kMatrixWidth);
-    FastLED.addLeds<CHIPSET, LED_PIN4, COLOR_ORDER> (leds, 3 * kMatrixWidth , kMatrixWidth);
-    DPRINT("4 strips");
-  }
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, 0, NUM_LEDS);
+  FastLED.addLeds<CHIPSET, LED_PIN2, COLOR_ORDER> (leds, NUM_LEDS, NUM_LEDS);
   FastLED.setBrightness(scale8(cBright, MAXBRIGHT) );
+  xX = random16();
+  yY = random16();
+  zZ = random16();
 }
 
 void loop() {

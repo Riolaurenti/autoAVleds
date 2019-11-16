@@ -1,14 +1,10 @@
-#define LED_PIN        2
-#define LED_PIN2       3
-#define LED_PIN3       4
-#define LED_PIN4       5
-//#define NUM_STRIPS     4 
-//#define NUM_LEDS_PER_STRIP 42 
+#define LED_PIN        5
+#define LED_PIN2       7
 
 #define COLOR_ORDER    GRB
 #define CHIPSET        WS2812B
-#define MAXBRIGHT 64
-#define STARTBRIGHT 60
+#define MAXBRIGHT 95
+#define STARTBRIGHT 120
 #define cTime 15000
 #define hTime 30
 #define STROBE_BEATS_PER_MINUTE 97.5
@@ -19,6 +15,15 @@ bool gReverseDirection = false;
 int ourAddr = ADDR-2; // Our IIC address holder for logic work.
 
 CRGBPalette16 cPal(RainbowColors_p); // global palette storage
+
+#define MAX_DIMENSION ((kMatrixWidth>kMatrixHeight) ? kMatrixWidth : kMatrixHeight) // Noise 
+static uint16_t xX;
+static uint16_t yY;
+static uint16_t zZ;
+uint16_t speed = 20;
+uint16_t scale = 30;
+uint8_t       colorLoop = 1; // Maybe unnecessary...
+uint8_t noise[MAX_DIMENSION][MAX_DIMENSION];
 
 int cur_Step = 0;
 volatile int clkVal;
@@ -54,6 +59,13 @@ unsigned long cMil; // store current loop's millis value
 unsigned long hMil; // store time of last hue change
 int itXmem[] = {0,0,0,0};
 
-
 typedef void (*functionList)(); // definition for list of effect function pointers
 extern const byte numFX;
+
+//MATRIX ONLY
+int shape = 0;
+
+int arrA[64] = {};
+int arrB[64] = {};
+int arrC[64] = {};
+int arrD[64] = {};

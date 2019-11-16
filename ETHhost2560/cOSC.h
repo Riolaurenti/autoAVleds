@@ -1,9 +1,31 @@
+void deBug(OSCMessage &msg, int addrOffset ){ // get float from clock #1 - Receive int/pulse
+  int c = msg.getFloat(0);
+  DPRINT("c = ");
+  DPRINT(c);
+  DPRINTLN();
+  int d = msg.getFloat(1);
+  DPRINT("d = ");
+  DPRINT(d);
+  DPRINTLN();
+}
+
 void CLK(OSCMessage &msg, int addrOffset ){ // get float from clock #1 - Receive int/pulse
   int a = msg.getFloat(0);
   clk = a;
   countBars();
   String strVal = String(a);
   String mOut = "1," + strVal;
+  char outClk[mOut.length()+2];
+  mOut.toCharArray(outClk, mOut.length()+1);
+  iic(outClk);  
+  DPRINTLN(outClk);
+}
+void CUSTOM(OSCMessage &msg, int addrOffset ){ // get float from clock #1 - Receive int/pulse
+  int a = msg.getFloat(0);
+  String strVal = String(a);
+  int b = msg.getFloat(1);
+  String strVal2 = String(b);
+  String mOut = strVal + "," + strVal2;
   char outClk[mOut.length()+2];
   mOut.toCharArray(outClk, mOut.length()+1);
   iic(outClk);  
@@ -22,7 +44,16 @@ void MODE(OSCMessage &msg, int addrOffset ){ // get float from clock #1 - Receiv
   char outMode[mOut.length()+2];
   mOut.toCharArray(outMode, mOut.length()+1);
   iic(outMode);
-  }
+}
+void STRIPMODE(OSCMessage &msg, int addrOffset ){ // get float from clock #1 - Receive int/pulse
+  int e = msg.getFloat(0);
+  String strVal = String(e);
+  // keep a record on master here?
+  String mOut = "21," + strVal;
+  char outMode[mOut.length()+2];
+  mOut.toCharArray(outMode, mOut.length()+1);
+  iic(outMode);
+}
 
 // there is a much cleaner way to do this... later.
 void onPulse(OSCMessage &msg, int addrOffset ){ // get float from clock #1 - Receive int/pulse

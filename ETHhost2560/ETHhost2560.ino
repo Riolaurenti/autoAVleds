@@ -48,9 +48,20 @@ void routeOSC() {
      while(size--) bundleIN.fill(Udp.read());
      if(!bundleIN.hasError()) {
       bundleIN.route("/m", MODE);
+      bundleIN.route("/s", STRIPMODE);
       bundleIN.route("/CLK", CLK);
       bundleIN.route("/p", onPulse);
       bundleIN.route("/v", VOL);
+     
+      bundleIN.route("/cFX", CUSTOM);
+      bundleIN.route("/cPFX", CUSTOM);
+      bundleIN.route("/cPal", CUSTOM);
+      bundleIN.route("/hS", CUSTOM); //hueSpeed
+      bundleIN.route("/rT", CUSTOM); //runTime
+      bundleIN.route("/fT", CUSTOM); //fadeTime
+
+       bundleIN.route("/lZ", CUSTOM);
+      bundleIN.route("/sM", CUSTOM);
      }
    }
 }
