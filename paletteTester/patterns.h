@@ -1,5 +1,7 @@
 static int colorIndex;
+int paletteIndex;
 uint8_t brightness = 255;
+CRGBPalette16 usePalette = primaryPalette;
 TBlendType currentBlending;
 
 void sinelon() {
@@ -14,9 +16,21 @@ void sinelon() {
   EVERY_N_MILLIS(50){
   colorIndex++;
   }
-  if (colorIndex > 254) {
+  if (colorIndex > 765) {
     colorIndex = 0;
   }
-  leds(posY,posX) = ColorFromPalette( currentPalette, colorIndex, brightness, currentBlending);
+  if (colorIndex < 255){
+	  usePalette = primaryPalette;
+	  paletteIndex = colorIndex;
+  }
+  if (colorIndex > 255 && colorIndex < 510){
+	  usePalette = secondaryPalette;
+	  paletteIndex = colorIndex - 255;
+  }
+  if (colorIndex > 510){
+	  usePalette = tertiaryPalette;
+	  paletteIndex = colorIndex - 510;
+  }
+  leds(posY,posX) = ColorFromPalette( usePalette, paletteIndex, brightness, currentBlending);
   FastLED.delay(1);
 }

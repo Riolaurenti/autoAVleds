@@ -1,8 +1,8 @@
-CRGBPalette16 currentPalette;
-CRGBPalette16 currentPalette2;
-CRGBPalette16 currentPalette3;
+CRGBPalette16 primaryPalette;
+CRGBPalette16 secondaryPalette;
+CRGBPalette16 tertiaryPalette;
 //simple pallets from 2 primary colors fading back to origin
-//as smoother. ligh "L" and dark"D".
+//as smoother. light "L" and dark"D".
 DEFINE_GRADIENT_PALETTE(Red_blueD1){
   0,255,0,0,
   128,0,0,255,
