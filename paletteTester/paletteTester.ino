@@ -19,9 +19,12 @@
 #define NUM_LEDS (MATRIX_WIDTH*MATRIX_HEIGHT)
 
 cLEDMatrix< -MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX, MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_ZIGZAG_BLOCKS> leds;
-
+//String incomingString = "";
+//int rgbValues [6];
+CRGBPalette16 dynamicPalette; 
 #include "palettes.h"
 #include "patterns.h"
+//#include "parser.h"
 
 void setup() {
   Serial.begin(115200);
@@ -29,12 +32,26 @@ void setup() {
   FastLED.addLeds<WS2812B, DATA2_PIN, GRB>(leds[0], 192, 192);
   FastLED.setBrightness(64);
   currentBlending = LINEARBLEND;
-  primaryPalette = Red_blueD1;
-  secondryPalette =	Red_blueL1;
-  tertiaryPalette = Blue_greenD1;
+  primaryPalette = dynamicPalette;
+  //secondaryPalette =	Red_blueL1;
+  //tertiaryPalette = Blue_greenD1;
   FastLED.clear();
+  fill_gradient(*dynamicPalette,numCRGB(1,1,1),CRGB(100,20,20));
 }
 
 void loop(){
+	 /* if (Serial.available()) {
+    incomingString = "";
+    while (Serial.available()) {
+      char c = Serial.read();
+      incomingString.concat(c);
+      //delay(50);
+    }
+    if (incomingString != '\0') {
+      Serial.println("input detected");
+      parser();
+      incomingString = "";
+    }
+  }*/
 	sinelon();
 }

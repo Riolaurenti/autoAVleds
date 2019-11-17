@@ -16,10 +16,10 @@ void sinelon() {
   EVERY_N_MILLIS(50){
   colorIndex++;
   }
-  if (colorIndex > 765) {
+  if (colorIndex > 255) {
     colorIndex = 0;
   }
-  if (colorIndex < 255){
+ /* if (colorIndex < 255){
 	  usePalette = primaryPalette;
 	  paletteIndex = colorIndex;
   }
@@ -30,7 +30,7 @@ void sinelon() {
   if (colorIndex > 510){
 	  usePalette = tertiaryPalette;
 	  paletteIndex = colorIndex - 510;
-  }
-  leds(posY,posX) = ColorFromPalette( usePalette, paletteIndex, brightness, currentBlending);
-  FastLED.delay(1);
+  }*/
+  leds(posY,posX) = ColorFromPalette( primaryPalette, paletteIndex, brightness, currentBlending);
+  FastLED.delay(50);
 }
