@@ -88,7 +88,7 @@ void txtC() {
 /*
  * Test me!
  */
-
+/*
 void mapNoiseToLEDsUsingPalette()
 {
   static uint8_t ihue=0;
@@ -147,7 +147,8 @@ void fillNoise8() {
   yY -= speed / 16;
   mapNoiseToLEDsUsingPalette();
 }
-
+*/
+/*
 void fire()
 {
   static byte heat[NUM_LEDS];
@@ -173,3 +174,4 @@ void fire()
       leds[pixelnumber] = color;
     }
 }
+*/
