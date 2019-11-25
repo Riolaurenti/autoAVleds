@@ -16,14 +16,6 @@ int ourAddr = ADDR-2; // Our IIC address holder for logic work.
 
 CRGBPalette16 cPal(RainbowColors_p); // global palette storage
 
-#define MAX_DIMENSION ((kMatrixWidth>kMatrixHeight) ? kMatrixWidth : kMatrixHeight) // Noise 
-static uint16_t xX;
-static uint16_t yY;
-static uint16_t zZ;
-uint16_t speed = 20;
-uint16_t scale = 30;
-uint8_t       colorLoop = 1; // Maybe unnecessary...
-uint8_t noise[MAX_DIMENSION][MAX_DIMENSION];
 
 int cur_Step = 0;
 volatile int clkVal;
@@ -64,8 +56,3 @@ extern const byte numFX;
 
 //MATRIX ONLY
 int shape = 0;
-
-int arrA[64] = {};
-int arrB[64] = {};
-int arrC[64] = {};
-int arrD[64] = {};

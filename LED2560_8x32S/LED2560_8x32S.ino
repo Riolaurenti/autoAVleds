@@ -33,8 +33,8 @@ functionList fxList[] = {
   colourFill,
   slantBars,
   simpleStrobe,
-  fillNoise8,
-  fire,
+ // fillNoise8,
+ // fire,
   BouncingBalls,
   txtA,
   txtB,
@@ -63,10 +63,10 @@ void setup() {
   if (cFX > (numFX - 1)) cFX = 0;
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, 0, 255);
   FastLED.addLeds<CHIPSET, LED_PIN2, COLOR_ORDER> (leds, 256, 255);
-  FastLED.setBrightness(scale8(cBright, MAXBRIGHT) );
-  xX = random16();
-  yY = random16();
-  zZ = random16();
+  //FastLED.setBrightness(scale8(cBright, MAXBRIGHT) );
+  //xX = random16();
+  //yY = random16();
+  //zZ = random16();
 }
 
 void loop() {
@@ -88,19 +88,23 @@ void loop() {
   else { // when autoPilot ...
     if (cMil - fxMil > fxDelay) {
       fxMil = cMil;
-      fxList[cFX]();
+      fxList[3]();
     }
   }
   if (Mode) {
     fadeAll(1+fadeTime); // fade out the leds after pulse
   }
   else {
+    //fadeAll(2);
+    
     if (fxList[cFX] == confetti) fadeAll(1+fadeTime);
     //if(fxList[cFX] == theLights) fadeAll(2);
     //if(fxList[cFX] == sinelon) fadeAll(2);
     if (fxList[cFX] == bpm) fadeAll(1+fadeTime);
     if (fxList[cFX] == bouncingTrails) fadeAll(1+fadeTime);
+  
   }  
+  
   FastLED.show(); // send the contents of the led memory to the LEDs
 }
 
