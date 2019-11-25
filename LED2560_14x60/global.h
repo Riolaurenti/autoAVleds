@@ -1,6 +1,5 @@
-#define LED_PIN        5
-#define LED_PIN2       7
-#define LED_PIN3       7
+#define LED_PIN        3
+
 
 #define COLOR_ORDER    GRB
 #define CHIPSET        WS2812B

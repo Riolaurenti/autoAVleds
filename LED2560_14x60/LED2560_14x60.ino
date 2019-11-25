@@ -59,9 +59,7 @@ void setup() {
   Wire.begin(ADDR);
   Wire.onReceive(eHandler);
   if (cFX > (numFX - 1)) cFX = 0;
-  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, 0, NUM_LEDS/3);
-  FastLED.addLeds<CHIPSET, LED_PIN2, COLOR_ORDER> (leds, (NUM_LEDS/3), NUM_LEDS/3);
-  FastLED.addLeds<CHIPSET, LED_PIN3, COLOR_ORDER> (leds, 2*(NUM_LEDS/3), NUM_LEDS/3);
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, 0, NUM_LEDS);
   FastLED.setBrightness(scale8(cBright, MAXBRIGHT) );
 
 }
@@ -85,7 +83,7 @@ void loop() {
   else { // when autoPilot ...
     if (cMil - fxMil > fxDelay) {
       fxMil = cMil;
-      fxList[cFX]();
+      fxList[0]();
     }
   }
   if (Mode) {
@@ -93,7 +91,7 @@ void loop() {
   }
   else {
     if (fxList[cFX] == confetti) fadeAll(1+fadeTime);
-    //if(fxList[cFX] == theLights) fadeAll(2);
+    //if(fxList[cFX] == glitter) fadeAll(10);
     //if(fxList[cFX] == sinelon) fadeAll(2);
     if (fxList[cFX] == bpm) fadeAll(1+fadeTime);
     if (fxList[cFX] == bouncingTrails) fadeAll(1+fadeTime);
