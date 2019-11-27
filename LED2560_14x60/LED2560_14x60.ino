@@ -1,14 +1,13 @@
 #include <FastLED.h>
 #include <Wire.h>
-//#include <LEDMatrix.h>
+#include <LEDMatrix.h>
 
 #define ADDR           2
 uint8_t brightness = 64;
 
-#include "XYmap.h"
 #include "global.h"
-#include "font.h"
-#include "messages.h"
+//#include "font.h"
+//#include "messages.h"
 #include "macros.h"
 #include "paints.h"
 #include "utils.h"
@@ -59,9 +58,9 @@ void setup() {
   Wire.begin(ADDR);
   Wire.onReceive(eHandler);
   if (cFX > (numFX - 1)) cFX = 0;
-  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, 0, NUM_LEDS);
-  FastLED.setBrightness(scale8(cBright, MAXBRIGHT) );
-
+  FastLED.addLeds<CHIPSET, DATA_PIN, COLOR_ORDER>(leds[0], leds.Size()).setCorrection(TypicalSMD5050);
+  FastLED.setBrightness(64);
+  FastLED.clear(true);
 }
 
 void loop() {

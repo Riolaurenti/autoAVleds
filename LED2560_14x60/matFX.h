@@ -3,8 +3,8 @@
 void autoShapes(){
   runCheck(10);
   int xA,yA,xB,yB;
-  xA = random8(0,kMatrixWidth); xB = random8(xA,kMatrixWidth);
-  yA = random8(0,kMatrixHeight); yB = random8(yA,kMatrixHeight);
+  xA = random8(0,MATRIX_WIDTH); xB = random8(xA,MATRIX_WIDTH);
+  yA = random8(0,MATRIX_HEIGHT); yB = random8(yA,MATRIX_HEIGHT);
   switch(shape){
     case 0: { drawRectangle(xA,xB,xB,yB,cPal); } break;
   }
@@ -36,19 +36,19 @@ void scrollText(byte message, byte style, CRGB fgColor, CRGB bgColor) {
     selectFlashString(message);
     loadCharBuffer(loadStringChar(message, currentMessageChar));
     cPal = RainbowColors_p; //  Debug
-    for (byte i = 0; i < kMatrixWidth; i++) bitBuffer[i] = 0;
+    for (byte i = 0; i < MATRIX_WIDTH; i++) bitBuffer[i] = 0;
   }
 
   paletteCycle += 15;
   if (currentCharColumn < 8) { // characters are 8 pixels wide
-    bitBuffer[(bitBufferPointer + kMatrixWidth - 1) % kMatrixWidth] = charBuffer[currentCharColumn]; // character
+    bitBuffer[(bitBufferPointer + MATRIX_WIDTH - 1) % MATRIX_WIDTH] = charBuffer[currentCharColumn]; // character
   } else {
-    bitBuffer[(bitBufferPointer + kMatrixWidth - 1) % kMatrixWidth] = 0; // space
+    bitBuffer[(bitBufferPointer + MATRIX_WIDTH - 1) % MATRIX_WIDTH] = 0; // space
   }
   CRGB pixelColor;
-  for (byte x = 0; x < kMatrixWidth; x++) {
+  for (byte x = 0; x < MATRIX_WIDTH; x++) {
     for (byte y = 0; y < 8; y++) { // characters are 8 pixels tall
-      if (bitRead(bitBuffer[(bitBufferPointer + x) % kMatrixWidth], y) == 1) {
+      if (bitRead(bitBuffer[(bitBufferPointer + x) % MATRIX_WIDTH], y) == 1) {
         if (style == RAINBOW) {
           pixelColor = ColorFromPalette(cPal, paletteCycle+y*16, 255);
         } else {
@@ -57,7 +57,7 @@ void scrollText(byte message, byte style, CRGB fgColor, CRGB bgColor) {
       } else {
         pixelColor = bgColor;
       }
-      leds[XY(x, y)] = pixelColor;
+      leds[mXY(x, y)] = pixelColor;
     }
   }
   currentCharColumn++;

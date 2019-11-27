@@ -1,8 +1,17 @@
 #define LED_PIN        3
-
-
 #define COLOR_ORDER    GRB
 #define CHIPSET        WS2812B
+
+#define MATRIX_WIDTH   60 // width of matrix
+#define MATRIX_HEIGHT  14 // height of matrix
+#define MATRIX_TYPE    HORIZONTAL_ZIGZAG_MATRIX
+#define MATRIX_SIZE    (MATRIX_WIDTH*MATRIX_HEIGHT)
+#define NUM_LEDS      MATRIX_SIZE
+cLEDMatrix<MATRIX_WIDTH, MATRIX_HEIGHT, MATRIX_TYPE> leds;
+//To cope with a matrix wired right to left, add - in front of your width.
+//Similarly if the matrix is wired down to up, add - in front of height.
+
+
 #define MAXBRIGHT 95
 #define STARTBRIGHT 120
 #define cTime 15000

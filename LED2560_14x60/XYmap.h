@@ -3,7 +3,7 @@ const uint8_t kMatrixWidth = 60;
 const uint8_t kMatrixHeight = 14;
 
 #define NUM_LEDS (kMatrixWidth * kMatrixHeight)
-CRGB leds[ NUM_LEDS ];
+//CRGB leds[ NUM_LEDS ];
 #define LAST_VISIBLE_LED 839
 uint16_t XY (uint16_t x, uint16_t y) {
   // any out of bounds address maps to the first hidden pixel
