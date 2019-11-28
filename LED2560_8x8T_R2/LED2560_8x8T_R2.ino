@@ -2,7 +2,7 @@
 #include <Wire.h>
 #include <LEDMatrix.h>
 #include <LEDText.h>
-#include <FontMatrise.h>
+#include <Font16x24.h>
 #include "global.h"
 #include "utils.h"
 #include "macros.h"
@@ -17,14 +17,17 @@ void setup() {
   DPRINT("Setup");
   Wire.begin(ADDR);
   Wire.onReceive(eHandler);
-  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds[0], leds.Size());
+  FastLED.addLeds<CHIPSET, LED_PIN1, COLOR_ORDER>(leds[0], 0,leds.Size()/3).setCorrection(TypicalSMD5050);
+  FastLED.addLeds<CHIPSET, LED_PIN2, COLOR_ORDER>(leds[0], leds.Size()/3, leds.Size()/3).setCorrection(TypicalSMD5050);
+  FastLED.addLeds<CHIPSET, LED_PIN3, COLOR_ORDER>(leds[0], 2*(leds.Size()/3), leds.Size()/3).setCorrection(TypicalSMD5050);
   FastLED.setBrightness(48);
   FastLED.clear(true);
-  lowTxt.SetFont(MatriseFontData); 
+  lowTxt.SetFont(Font16x24Data); 
   lowTxt.Init(&leds, leds.Width(), lowTxt.FontHeight() + 1, 0, 4);
   lowTxt.SetText((unsigned char *)TxtAncs, sizeof(TxtAncs) - 1);
   lowTxt.SetTextColrOptions(COLR_RGB | COLR_SINGLE, 0xff, 0xff, 0xff);
-  lowTxt.SetScrollDirection(SCROLL_LEFT);
+  lowTxt.SetScrollDirection(SCROLL_UP);
+  //lowTxt.SetTextDirection(CHAR_LEFT);
   lowTxt.SetFrameRate(2);
 
   mstep = byte( 256 / min((leds.Width() - 1), 255)); //mstep is the step size to distribute 256 over an array the width of the matrix
