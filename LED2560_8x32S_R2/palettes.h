@@ -1,4 +1,5 @@
 
+
 byte paletteNumber = 0;
 byte numberOfPalettes = 18;
 DEFINE_GRADIENT_PALETTE( Pastel1_08_gp ) {//group 1
@@ -370,3 +371,34 @@ DEFINE_GRADIENT_PALETTE( saga_17_gp ) {//group green -> red.
   241,  66,  1,  0,
   255,  41,  0,  0
 };
+
+void selPal() {
+  switch(cPalVal) {
+    case 0:    cPal = CloudColors_p;    break;
+    case 1:     cPal = LavaColors_p;    break;
+    case 2:    cPal = OceanColors_p;    break;
+    case 4:    cPal = ForestColors_p;    break;
+    case 5:    cPal = RainbowColors_p;    break;    
+    case 6:    cPal = PartyColors_p;    break;    
+    case 7:    cPal = HeatColors_p;    break;
+    case 8:    cPal = Pastel1_08_gp;    break;
+    case 9:    cPal = Paired_08_gp;    break;
+    case 10:    cPal = Dark2_08_gp;    break;
+    case 11:    cPal = RdYlGn_08_gp;    break;
+    case 12:    cPal = RdYlBu_08_gp;    break;
+    case 13:    cPal = RdBu_08_gp;    break;
+    case 14 :    cPal = PuOr_08_gp;    break;
+    case 15:    cPal = PRGn_08_gp;    break;
+    case 16:    cPal = Fuschia_8_gp;      break;
+    case 17:      cPal = saga_07_gp;      break;
+    case 18:      cPal = saga_08_gp;      break;
+    case 19:      cPal = saga_09_gp;      break;
+    case 20:      cPal = saga_10_gp;      break;
+    case 21:      cPal = saga_11_gp;      break;
+    case 22:      cPal = saga_12_gp;      break;
+    case 23:      cPal = saga_13_gp;      break;
+    case 24:      cPal = saga_14_gp;      break;
+    case 25:      cPal = saga_15_gp;      break;
+    case 26:      cPal = saga_17_gp;      break;    
+    }
+}
