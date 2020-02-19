@@ -17,10 +17,11 @@ void setup() {
   DPRINT("Setup");
   Wire.begin(ADDR);
   Wire.onReceive(eHandler);
-  FastLED.addLeds<CHIPSET, LED_PIN1, COLOR_ORDER>(leds[0], 0,leds.Size()/3).setCorrection(TypicalSMD5050);
-  FastLED.addLeds<CHIPSET, LED_PIN2, COLOR_ORDER>(leds[0], leds.Size()/3, leds.Size()/3).setCorrection(TypicalSMD5050);
-  FastLED.addLeds<CHIPSET, LED_PIN3, COLOR_ORDER>(leds[0], 2*(leds.Size()/3), leds.Size()/3).setCorrection(TypicalSMD5050);
-  FastLED.setBrightness(48);
+  FastLED.addLeds<CHIPSET, LED_PIN1, COLOR_ORDER>(leds[0], 0,leds.Size()/4).setCorrection(TypicalSMD5050);
+  FastLED.addLeds<CHIPSET, LED_PIN2, COLOR_ORDER>(leds[0], leds.Size()/4, leds.Size()/4).setCorrection(TypicalSMD5050);
+  FastLED.addLeds<CHIPSET, LED_PIN3, COLOR_ORDER>(leds[0], 2*(leds.Size()/4), leds.Size()/4).setCorrection(TypicalSMD5050);
+  FastLED.addLeds<CHIPSET, LED_PIN3, COLOR_ORDER>(leds[0], 3*(leds.Size()/4), leds.Size()/4).setCorrection(TypicalSMD5050);
+  FastLED.setBrightness(96);
   FastLED.clear(true);
   lowTxt.SetFont(Font16x24Data); 
   lowTxt.Init(&leds, leds.Width(), lowTxt.FontHeight() + 1, 0, 4);

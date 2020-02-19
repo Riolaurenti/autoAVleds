@@ -2,13 +2,14 @@
 #define LED_PIN1        5
 #define LED_PIN2        7
 #define LED_PIN3        9
+#define LED_PIN3        11
 #define COLOR_ORDER    GRB
 #define CHIPSET        WS2812B
 #define MATRIX_TILE_WIDTH   8  // Set this negative if physical led 0 is opposite to where you want logical 0
 #define MATRIX_TILE_HEIGHT  8  // Set this negative if physical led 0 is opposite to where you want logical 0
 #define MATRIX_TYPE    HORIZONTAL_ZIGZAG_MATRIX  // See top of LEDMatrix.h for matrix wiring types
 #define MATRIX_TILE_H       3  // number of matrices arranged horizontally (negative for reverse order)
-#define MATRIX_TILE_V       3  // number of matrices arranged vertically (negative for reverse order)
+#define MATRIX_TILE_V       4  // number of matrices arranged vertically (negative for reverse order)
 #define MATRIX_SIZE         (MATRIX_WIDTH*MATRIX_HEIGHT)
 #define MATRIX_WIDTH        (MATRIX_TILE_WIDTH*MATRIX_TILE_H)
 #define MATRIX_HEIGHT       (MATRIX_TILE_HEIGHT*MATRIX_TILE_V)
