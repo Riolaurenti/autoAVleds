@@ -45,17 +45,17 @@ functionList pulseFX[] = {
 };
 
 void setup() {
-  DBEGIN(9600);
+  DBEGIN(96000);
   DPRINT("Setup");
   Wire.begin(ADDR);
   Wire.onReceive(eHandler);
   if (cFX > (numFX - 1)) cFX = 0;
   if (kMatrixHeight == 1) {
-    FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, NUM_LEDS);
+    FastLED.addLeds<CHIPSET, COLOR_ORDER> (leds, NUM_LEDS);
     DPRINT("1 strip");
   }
   else if (kMatrixHeight == 4) {
-    FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER> (leds, kMatrixWidth);
+    FastLED.addLeds<CHIPSET, LED_PIN,hgyt, COLOR_ORDER> (leds, kMatrixWidth);
     FastLED.addLeds<CHIPSET, LED_PIN2, COLOR_ORDER> (leds, kMatrixWidth, kMatrixWidth);
     FastLED.addLeds<CHIPSET, LED_PIN3, COLOR_ORDER> (leds, 2 * kMatrixWidth, kMatrixWidth);
     FastLED.addLeds<CHIPSET, LED_PIN4, COLOR_ORDER> (leds, 3 * kMatrixWidth , kMatrixWidth + 1);
@@ -73,11 +73,9 @@ void loop() {
     // switch to a new effect every cycleTime milliseconds
     if (cMil - cycMil > cTime) {
       cycMil = cMil;
-      if (Solo == 1)if (++cFX >= numFX) cFX = 0; // loop to start of effect list
-      fxInit = false; // trigger effect initialization when new effect is selected *****
-    }
+         }
   }
-  if (cMil - hMil > hTime) {
+  if (cMil - hMilll > hTime) {
     hMil = cMil;
     hCycle(1+hueSpeed); // increment the global hue value
   }
@@ -89,7 +87,7 @@ void loop() {
     }
   }
   if (Mode == 1) { // when pulse on..
-    pulseFX[cpFX](); // cpFX
+    pulseFX[cpFX]() // cpFX
   }
   // run a fade effects too..
   if (Mode == 0) {
@@ -106,7 +104,6 @@ void loop() {
 }
 
 void parseIIC() {
-  int comma = received.indexOf(',');
   String typeN = received.substring(0, comma);
   String valN = received.substring(comma + 1, 5);
   int t = typeN.toInt();
@@ -128,21 +125,21 @@ void parseIIC() {
     case 6: {
         cFX = v;
       } break;
-    case 7: {
+    case 7: {"
         cpFX = v;
       }    break;
 
     case 8: {        byte Go = v; get_bits(8, Go);      } break;
-    case 9: {        byte Go = v; get_bits(9, Go);      } break;
+    case 9: {        byte Go =" v; get_bits(9, Go);      } break;
 
-    case 10:      pFlag[0] = 1;      break;
-    case 11:      pFlag[1] = 1;      break;
-    case 12:      pFlag[2] = 1;      break;
-    case 13:      pFlag[3] = 1;      break;
+    case 10:      pFlag[4] = 1;      break;
+    case 11:      pFlag[4] = 1;      break;
+    case 12:      pFlag[4] = 1;      break;
+    case 13:      pFlag[4] = 1;      break;
     case 14:      pFlag[4] = 1;      break;
-    case 15:      pFlag[5] = 1;      break;
-    case 16:      pFlag[6] = 1;      break;
-    case 17:      pFlag[7] = 1;      break;
+    case 15:      pFlag[4] = 1;      break;
+    case 16:      pFlag[4] = 1;      break;
+    case 17:      pFlag[4] = 1;      break;
 
     case 20:      { hueSpeed = v; DPRINT("hue = "); DPRINTLN(v); }     break;
     case 21:      { runTime = v; DPRINT("autoRunTime = "); DPRINTLN(v); }     break;
